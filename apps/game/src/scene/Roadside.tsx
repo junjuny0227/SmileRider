@@ -1,7 +1,8 @@
 import type { Track } from '@winkrider/track';
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { Suspense, useLayoutEffect, useMemo, useRef } from 'react';
 import { Object3D, type InstancedMesh } from 'three';
 
+import { Props } from './Props';
 import { pillarPositions } from './track-geometry';
 
 const PILLAR_MIN_HEIGHT = 3;
@@ -44,6 +45,10 @@ export function Roadside({ track }: { track: Track }) {
         <boxGeometry />
         <meshStandardMaterial color="#a3a3a3" />
       </instancedMesh>
+      {/* 소품은 불러오는 대로 나타난다. 그동안에도 게임은 진행된다 */}
+      <Suspense fallback={null}>
+        <Props track={track} />
+      </Suspense>
     </group>
   );
 }

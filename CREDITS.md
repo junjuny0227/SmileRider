@@ -11,6 +11,19 @@ WinkRider가 사용하는 외부 에셋과 그 출처, 라이선스입니다. CC
 
 MediaPipe WASM(`@mediapipe/tasks-vision`)은 npm 패키지에서 빌드할 때 복사합니다 (Apache-2.0).
 
+## 3D 모델
+
+`apps/game/public/models3d/`의 모델은 원본 GLB에 텍스처를 넣고 `@gltf-transform/cli` 4.5.1의 `optimize`(압축 없음)로 정리했습니다.
+
+| 파일 | 원본 | 출처 | 라이선스 |
+|---|---|---|---|
+| `kart-oopi.glb` | `kart-oopi.glb` | [Kenney Car Kit](https://kenney.nl/assets/car-kit) | CC0 |
+| `building-a.glb`, `building-c.glb`, `building-f.glb`, `building-k.glb` | `building-type-a/c/f/k.glb` | [Kenney City Kit (Suburban)](https://kenney.nl/assets/city-kit-suburban) | CC0 |
+| `tree-large.glb`, `tree-small.glb` | `tree-large.glb`, `tree-small.glb` | [Kenney City Kit (Suburban)](https://kenney.nl/assets/city-kit-suburban) | CC0 |
+| `street-light.glb` | `light-square.glb` | [Kenney City Kit (Roads)](https://kenney.nl/assets/city-kit-roads) | CC0 |
+
+도로, 가드레일, 고가 교각은 에셋 없이 트랙 중심선 데이터로 코드에서 만듭니다.
+
 ## 소리
 
 | 파일 | 원본 | 출처 | 라이선스 |

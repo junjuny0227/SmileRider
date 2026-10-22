@@ -146,7 +146,7 @@ React 19.4가 나오면 R3F가 따라 업데이트되기 전까지 맞지 않을
 
 | 대상 | 에셋 | 비고 |
 |---|---|---|
-| 카트 | [Kenney Toy Car Kit](https://kenney.nl/assets/toy-car-kit) (1순위) 또는 [Kenney Car Kit](https://kenney.nl/assets/car-kit) | 내려받아 카트처럼 생긴 차, 운전자 캐릭터, glTF 포함 여부를 확인한 뒤 결정 |
+| 카트 | [Kenney Car Kit](https://kenney.nl/assets/car-kit)의 `kart-oopi` (청록) | **확정.** 운전자가 탄 오픈휠 카트. 색만 다른 5종이 있어 나중에 고스트·AI 상대를 색으로 구분할 수 있음 |
 | 배경 소품 (건물, 나무, 가로등, 표지판) | [Kenney City Kit](https://kenney.nl/assets/city-kit-roads) 계열 | 도로 조각은 쓰지 않음 |
 | 트랙 주변 소품 (관중석, 깃발 등) | [Kenney Racing Kit](https://kenney.nl/assets/racing-kit) | 타일 방식 도로 조각은 쓰지 않음 |
 | 부족한 것 | [Poly Pizza](https://poly.pizza) | 모델마다 라이선스가 다르므로 각 페이지에서 확인. "Poly by Google" 모델은 보통 CC-BY라 출처 표기 필요 |
@@ -456,5 +456,4 @@ Vitest를 씁니다.
 
 ## 11. 미정 사항
 
-- 카트 모델 최종 선택: Kenney Toy Car Kit과 Car Kit을 내려받아 확인한 뒤 결정합니다.
 - BGM: 출시 전에 고름 (후보는 7장 사운드 절)
