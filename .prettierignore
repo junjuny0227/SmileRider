@@ -4,3 +4,5 @@
 /.nx/cache
 /.nx/workspace-data
 .nx/self-healing
+# 입력 재생 기준 데이터 (자동 생성)
+packages/kart/src/fixtures/*.json
