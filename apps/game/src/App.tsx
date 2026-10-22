@@ -3,6 +3,8 @@ import { createRibbonSurface, TICK_RATE } from '@winkrider/kart';
 import { buildTrack, skyway } from '@winkrider/track';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { loadAudioSettings, saveAudioSettings, type AudioSettings } from './audio/audio-settings';
+import { applyAudioSettings, initAudio, playSfx } from './audio/sfx';
 import type { FlowResult } from './calibration/flow';
 import { isMobileDevice } from './device/is-mobile';
 import { CameraPreview } from './hud/CameraPreview';
@@ -45,6 +47,7 @@ export function App() {
   const [result, setResult] = useState<{ session: RaceSession; outcome: SaveOutcome } | null>(null);
   const [raceId, setRaceId] = useState(0);
   const [best, setBest] = useState(loadBest);
+  const [audioSettings, setAudioSettings] = useState<AudioSettings>(() => loadAudioSettings());
 
   const vision = useRef<VisionClient | null>(null);
   const listeners = useRef(new Set<(frame: VisionFrame) => void>());
@@ -88,6 +91,18 @@ export function App() {
     vision.current = null;
   };
 
+  // 브라우저는 클릭 전에는 소리를 막으므로 플레이 버튼을 누를 때 소리를 켠다
+  const startAudio = () => {
+    initAudio(audioSettings);
+    playSfx('uiClick');
+  };
+
+  const changeAudio = (settings: AudioSettings) => {
+    setAudioSettings(settings);
+    saveAudioSettings(settings);
+    applyAudioSettings(settings);
+  };
+
   const beginRace = (nextMode: InputMode, cal: FlowResult | null) => {
     cameraInput.current =
       nextMode === 'camera' && cal
@@ -99,6 +114,7 @@ export function App() {
   };
 
   const playCamera = async () => {
+    startAudio();
     setLoading(true);
     setCameraError(null);
     try {
@@ -113,6 +129,7 @@ export function App() {
   };
 
   const playKeyboard = () => {
+    startAudio();
     stopVision();
     setCameraError(null);
     beginRace('keyboard', null);
@@ -193,6 +210,8 @@ export function App() {
           loading={loading}
           cameraError={cameraError}
           best={best}
+          audio={audioSettings}
+          onAudioChange={changeAudio}
           onSteeringChange={setSteering}
           onPreviewChange={setShowPreview}
           onPlayCamera={() => void playCamera()}

@@ -1,5 +1,6 @@
 import type { SteeringMode } from '@winkrider/controls';
 
+import type { AudioSettings } from '../audio/audio-settings';
 import { formatRaceTime } from '../i18n/format';
 import { ko } from '../i18n/ko';
 import type { BestRecord } from '../records/records';
@@ -12,6 +13,8 @@ export interface StartScreenProps {
   loading: boolean;
   cameraError: CameraErrorKind | 'model-load-failed' | null;
   best: { camera: BestRecord | null; keyboard: BestRecord | null };
+  audio: AudioSettings;
+  onAudioChange: (settings: AudioSettings) => void;
   onSteeringChange: (mode: SteeringMode) => void;
   onPreviewChange: (show: boolean) => void;
   onPlayCamera: () => void;
@@ -83,6 +86,28 @@ export function StartScreen(props: StartScreenProps) {
         <label>
           <input type="checkbox" checked={props.showPreview} onChange={(e) => props.onPreviewChange(e.target.checked)} />{' '}
           {ko.start.preview}
+        </label>
+      </fieldset>
+
+      <fieldset style={{ border: 'none', display: 'flex', gap: 16, alignItems: 'center' }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={props.audio.muted}
+            onChange={(e) => props.onAudioChange({ ...props.audio, muted: e.target.checked })}
+          />{' '}
+          {ko.start.mute}
+        </label>
+        <label>
+          {ko.start.volume}{' '}
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.1}
+            value={props.audio.volume}
+            onChange={(e) => props.onAudioChange({ ...props.audio, volume: Number(e.target.value) })}
+          />
         </label>
       </fieldset>
 

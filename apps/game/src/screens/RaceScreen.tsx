@@ -1,9 +1,13 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { NO_INPUT, type ControlInput, type TrackSurface } from '@winkrider/kart';
+import { DEFAULT_KART_CONFIG, NO_INPUT, type ControlInput, type TrackSurface } from '@winkrider/kart';
 import type { Track } from '@winkrider/track';
-import { useRef, type RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { Quaternion, Vector3, type Group } from 'three';
 
+import { createEngineSound } from '../audio/engine-sound';
+import { getAudio, playSfx } from '../audio/sfx';
+import { createSkidSound } from '../audio/skid-sound';
+import { soundEvents } from '../audio/sound-events';
 import { Hud } from '../hud/Hud';
 import { createRaceSession, tickRaceSession, type InputMode, type RaceSession } from '../race/session';
 import { ChaseCamera } from '../scene/ChaseCamera';
@@ -34,6 +38,24 @@ function Simulation({ session, input, kart, track, surface, readInput, isFaceVis
   const accumulator = useRef(0);
   const reported = useRef(false);
   const tmp = useRef({ up: new Vector3(), tilt: new Quaternion(), yaw: new Quaternion() });
+  const sounds = useRef<{
+    engine: ReturnType<typeof createEngineSound>;
+    skid: ReturnType<typeof createSkidSound>;
+  } | null>(null);
+
+  // 소리가 켜져 있으면(플레이 버튼을 눌렀으면) 엔진음과 마찰음을 만든다
+  useEffect(() => {
+    const audio = getAudio();
+    if (!audio) return;
+    const engine = createEngineSound(audio.ctx, audio.master);
+    const skid = createSkidSound(audio.ctx, audio.master);
+    sounds.current = { engine, skid };
+    return () => {
+      engine.stop();
+      skid.stop();
+      sounds.current = null;
+    };
+  }, []);
 
   useFrame((_, delta) => {
     const step = advanceFixedStep(accumulator.current, delta);
@@ -42,9 +64,17 @@ function Simulation({ session, input, kart, track, surface, readInput, isFaceVis
     for (let i = 0; i < step.ticks; i++) {
       const next = readInput();
       input.current = next;
+      const prev = s;
       s = tickRaceSession(s, next, isFaceVisible(), track, surface);
+      for (const name of soundEvents(prev, s)) playSfx(name);
     }
     session.current = s;
+    sounds.current?.engine.update(
+      s.kart.speed / DEFAULT_KART_CONFIG.maxSpeed,
+      input.current.throttle,
+      s.kart.boostTimeLeft > 0,
+    );
+    sounds.current?.skid.update(s.kart.drifting ? 1 : 0);
 
     const group = kart.current;
     if (group) {

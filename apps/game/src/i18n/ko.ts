@@ -17,6 +17,8 @@ export const ko = {
     steeringWink: '윙크',
     steeringTilt: '고개 기울이기',
     preview: '카메라 미리보기',
+    mute: '음소거',
+    volume: '음량',
     best: '최고 기록',
     bestCamera: '카메라',
     bestKeyboard: '키보드',
