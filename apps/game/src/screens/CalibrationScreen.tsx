@@ -1,32 +1,22 @@
-import type { SteeringMode, VisionFrame } from '@smilerider/controls';
+import type { Calibration, VisionFrame } from '@smilerider/controls';
 import { useEffect, useState } from 'react';
 
-import {
-  advanceFlow,
-  createFlow,
-  flowResult,
-  GESTURE_HELP_SECONDS,
-  skipStep,
-  STEP_SECONDS,
-  switchToHeadTilt,
-  type FlowResult,
-} from '../calibration/flow';
+import { advanceFlow, createFlow, flowResult, STEP_SECONDS } from '../calibration/flow';
 import { CameraPreview } from '../hud/CameraPreview';
 import { ko } from '../i18n/ko';
 import { buttonStyle, screenStyle, secondaryButtonStyle } from './styles';
 
 export interface CalibrationScreenProps {
-  steering: SteeringMode;
   stream: MediaStream;
   /** 인식 결과를 받기 시작하고, 그만 받는 함수를 돌려준다 */
   subscribe: (listener: (frame: VisionFrame) => void) => () => void;
-  onDone: (result: FlowResult) => void;
+  onDone: (calibration: Calibration) => void;
   onCancel: () => void;
 }
 
-/** 보정 겸 튜토리얼 (기획 10.2): 평소 표정 → 윙크 또는 고개 기울이기 → 입 → 주먹 → 엄지 척 */
-export function CalibrationScreen({ steering, stream, subscribe, onDone, onCancel }: CalibrationScreenProps) {
-  const [flow, setFlow] = useState(() => createFlow(steering));
+/** 보정 겸 튜토리얼 (기획 10.2): 평소 얼굴 → 고개 왼쪽 → 입 → 웃음 */
+export function CalibrationScreen({ stream, subscribe, onDone, onCancel }: CalibrationScreenProps) {
+  const [flow, setFlow] = useState(createFlow);
   const [last, setLast] = useState<VisionFrame | null>(null);
 
   useEffect(
@@ -38,9 +28,8 @@ export function CalibrationScreen({ steering, stream, subscribe, onDone, onCance
     [subscribe],
   );
 
-  const duration = STEP_SECONDS[flow.step] ?? GESTURE_HELP_SECONDS;
-  const progress = flow.step === 'done' ? 1 : Math.min(1, flow.elapsed / duration);
-  const shapes = last?.face?.blendshapes;
+  const progress = flow.step === 'done' ? 1 : Math.min(1, flow.elapsed / STEP_SECONDS[flow.step]);
+  const face = last?.face;
 
   return (
     <main style={screenStyle}>
@@ -55,26 +44,16 @@ export function CalibrationScreen({ steering, stream, subscribe, onDone, onCance
       <div style={{ width: 320, height: 10, background: 'rgba(0,0,0,0.1)', borderRadius: 5 }}>
         <div style={{ width: `${progress * 100}%`, height: '100%', background: '#e5484d', borderRadius: 5 }} />
       </div>
-      {shapes && (
+      {face && (
         <p style={{ margin: 0, fontVariantNumeric: 'tabular-nums', fontSize: 14, opacity: 0.7 }}>
-          eyeBlinkLeft {shapes.eyeBlinkLeft.toFixed(2)} · eyeBlinkRight {shapes.eyeBlinkRight.toFixed(2)} · jawOpen{' '}
-          {shapes.jawOpen.toFixed(2)} · {last?.hand?.gesture ?? '-'}
+          roll {face.headRollDeg.toFixed(1)}° · jawOpen {face.blendshapes.jawOpen.toFixed(2)} · mouthSmile{' '}
+          {face.blendshapes.mouthSmile.toFixed(2)}
         </p>
       )}
       <div style={{ display: 'flex', gap: 12 }}>
         {flow.step === 'done' && (
           <button style={buttonStyle} onClick={() => onDone(flowResult(flow))}>
             {ko.calibration.start}
-          </button>
-        )}
-        {flow.notice === 'suggestHeadTilt' && (
-          <button style={buttonStyle} onClick={() => setFlow((prev) => switchToHeadTilt(prev))}>
-            {ko.calibration.switchToTilt}
-          </button>
-        )}
-        {flow.notice === 'gestureHelp' && (
-          <button style={secondaryButtonStyle} onClick={() => setFlow((prev) => skipStep(prev))}>
-            {ko.calibration.skip}
           </button>
         )}
         <button style={secondaryButtonStyle} onClick={onCancel}>

@@ -1,11 +1,10 @@
-import { createKeyTracker, DEFAULT_CONTROLS_CONFIG, type SteeringMode, type VisionFrame } from '@smilerider/controls';
+import { createKeyTracker, DEFAULT_CONTROLS_CONFIG, type Calibration, type VisionFrame } from '@smilerider/controls';
 import { autopilotInput, createRibbonSurface, TICK_RATE, type KartState } from '@smilerider/kart';
 import { buildTrack, skyway } from '@smilerider/track';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { loadAudioSettings, saveAudioSettings, type AudioSettings } from './audio/audio-settings';
 import { applyAudioSettings, initAudio, playSfx } from './audio/sfx';
-import type { FlowResult } from './calibration/flow';
 import { readDebugFlags } from './debug/debug-flags';
 import { isMobileDevice } from './device/is-mobile';
 import { CameraPreview } from './hud/CameraPreview';
@@ -44,11 +43,10 @@ export function App() {
 
   const [screen, setScreen] = useState<Screen>('start');
   const [mode, setMode] = useState<InputMode>('keyboard');
-  const [steering, setSteering] = useState<SteeringMode>('wink');
   const [showPreview, setShowPreview] = useState(true);
   const [loading, setLoading] = useState(false);
   const [cameraError, setCameraError] = useState<CameraErrorKind | 'model-load-failed' | null>(null);
-  const [calibration, setCalibration] = useState<FlowResult | null>(null);
+  const [calibration, setCalibration] = useState<Calibration | null>(null);
   const [result, setResult] = useState<{ session: RaceSession; outcome: SaveOutcome } | null>(null);
   const [raceId, setRaceId] = useState(0);
   const [best, setBest] = useState(loadBest);
@@ -112,11 +110,8 @@ export function App() {
     applyAudioSettings(settings);
   };
 
-  const beginRace = (nextMode: InputMode, cal: FlowResult | null) => {
-    cameraInput.current =
-      nextMode === 'camera' && cal
-        ? createCameraInput(cal.calibration, cal.mode, cal.tiltSign, DEFAULT_CONTROLS_CONFIG)
-        : null;
+  const beginRace = (nextMode: InputMode, cal: Calibration | null) => {
+    cameraInput.current = nextMode === 'camera' && cal ? createCameraInput(cal, DEFAULT_CONTROLS_CONFIG) : null;
     setMode(nextMode);
     setRaceId((id) => id + 1);
     setScreen('race');
@@ -180,7 +175,6 @@ export function App() {
     case 'calibration':
       return vision.current ? (
         <CalibrationScreen
-          steering={steering}
           stream={vision.current.stream}
           subscribe={subscribe}
           onDone={(cal) => {
@@ -218,14 +212,12 @@ export function App() {
     default:
       return (
         <StartScreen
-          steering={steering}
           showPreview={showPreview}
           loading={loading}
           cameraError={cameraError}
           best={best}
           audio={audioSettings}
           onAudioChange={changeAudio}
-          onSteeringChange={setSteering}
           onPreviewChange={setShowPreview}
           onPlayCamera={() => void playCamera()}
           onPlayKeyboard={playKeyboard}

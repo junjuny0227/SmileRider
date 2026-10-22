@@ -17,9 +17,6 @@ export function InputIndicator({ input }: { input: ControlInput }) {
     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
       <span style={cell(input.steer < -0.05)}>{ko.input.left}</span>
       <span style={cell(input.steer > 0.05)}>{ko.input.right}</span>
-      <span style={{ ...cell(input.throttle > 0.05), minWidth: 64 }}>
-        {ko.input.throttle} {Math.round(input.throttle * 100)}%
-      </span>
       <span style={cell(input.drift)}>{ko.input.drift}</span>
       <span style={cell(input.boost)}>{ko.input.boost}</span>
     </div>

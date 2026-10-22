@@ -3,7 +3,6 @@ import {
   updateFaceControls,
   type Calibration,
   type ControlsConfig,
-  type SteeringMode,
   type VisionFrame,
 } from '@smilerider/controls';
 import { NO_INPUT, type ControlInput } from '@smilerider/kart';
@@ -23,12 +22,7 @@ export interface CameraInput {
  * 인식 결과를 주행 입력으로 바꾼다. 주행 틱이 인식보다 잦으므로
  * 부스트는 인식 결과 하나당 한 번만 전달한다 (Pre-flight Ruling).
  */
-export function createCameraInput(
-  calibration: Calibration,
-  mode: SteeringMode,
-  tiltSign: 1 | -1,
-  config: ControlsConfig,
-): CameraInput {
+export function createCameraInput(calibration: Calibration, config: ControlsConfig): CameraInput {
   let state = createFaceControlsState();
   let input: ControlInput = NO_INPUT;
   let boostPending = false;
@@ -37,7 +31,7 @@ export function createCameraInput(
 
   return {
     push(frame) {
-      const result = updateFaceControls(state, frame, calibration, mode, tiltSign, config);
+      const result = updateFaceControls(state, frame, calibration, config);
       state = result.state;
       input = result.input;
       if (result.input.boost) boostPending = true;

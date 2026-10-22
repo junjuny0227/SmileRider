@@ -1,5 +1,3 @@
-import type { SteeringMode } from '@smilerider/controls';
-
 import type { AudioSettings } from '../audio/audio-settings';
 import { formatRaceTime } from '../i18n/format';
 import { ko } from '../i18n/ko';
@@ -8,14 +6,12 @@ import type { CameraErrorKind } from '../vision/camera-error';
 import { buttonStyle, screenStyle, secondaryButtonStyle } from './styles';
 
 export interface StartScreenProps {
-  steering: SteeringMode;
   showPreview: boolean;
   loading: boolean;
   cameraError: CameraErrorKind | 'model-load-failed' | null;
   best: { camera: BestRecord | null; keyboard: BestRecord | null };
   audio: AudioSettings;
   onAudioChange: (settings: AudioSettings) => void;
-  onSteeringChange: (mode: SteeringMode) => void;
   onPreviewChange: (show: boolean) => void;
   onPlayCamera: () => void;
   onPlayKeyboard: () => void;
@@ -71,18 +67,6 @@ export function StartScreen(props: StartScreenProps) {
       {props.loading && <p style={{ margin: 0 }}>{ko.start.loading}</p>}
 
       <fieldset style={{ border: 'none', display: 'flex', gap: 16, alignItems: 'center' }}>
-        <span>{ko.start.steering}</span>
-        {(['wink', 'headTilt'] as const).map((mode) => (
-          <label key={mode}>
-            <input
-              type="radio"
-              name="steering"
-              checked={props.steering === mode}
-              onChange={() => props.onSteeringChange(mode)}
-            />{' '}
-            {mode === 'wink' ? ko.start.steeringWink : ko.start.steeringTilt}
-          </label>
-        ))}
         <label>
           <input type="checkbox" checked={props.showPreview} onChange={(e) => props.onPreviewChange(e.target.checked)} />{' '}
           {ko.start.preview}

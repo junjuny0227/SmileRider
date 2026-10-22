@@ -34,17 +34,19 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'SmileRider' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '카메라로 플레이' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '키보드로 플레이' })).toBeTruthy();
+    expect(screen.queryByText('조향 방식')).toBeNull();
   });
 
-  it('키보드로 플레이하면 키 입력을 레이스 화면에 전달하고, 포커스를 잃으면 키가 풀린다', () => {
+  it('키보드로 플레이하면 엑셀은 자동이고 키 입력을 레이스 화면에 전달하며, 포커스를 잃으면 키가 풀린다', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: '키보드로 플레이' }));
     expect(captured?.mode).toBe('keyboard');
     expect(captured?.isFaceVisible()).toBe(true);
-    fireEvent.keyDown(window, { key: 'ArrowUp' });
     expect(captured?.readInput().throttle).toBe(1);
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(captured?.readInput().steer).toBe(1);
     fireEvent.blur(window);
-    expect(captured?.readInput().throttle).toBe(0);
+    expect(captured?.readInput()).toEqual({ steer: 0, throttle: 1, drift: false, boost: false });
   });
 
   it('완주하면 결과 화면, 다시 하기는 바로 레이스, 처음으로는 시작 화면', () => {
