@@ -3,6 +3,7 @@ import {
   calibrateMax,
   calibrateTilt,
   DEFAULT_CONTROLS_CONFIG,
+  normalize,
   type Calibration,
   type FaceFrame,
   type NeutralPose,
@@ -10,7 +11,7 @@ import {
 } from '@smilerider/controls';
 
 export type FlowStep = 'neutral' | 'tiltLeft' | 'jaw' | 'smile' | 'done';
-export type FlowNotice = 'noFace' | 'retry' | 'tiltTooSmall' | null;
+export type FlowNotice = 'noFace' | 'retry' | 'tiltTooSmall' | 'smileMouthOpen' | null;
 
 /** 각 단계의 길이(s). 평소 값은 기획 10.9의 neutralSeconds */
 export const STEP_SECONDS: Record<Exclude<FlowStep, 'done'>, number> = {
@@ -79,7 +80,15 @@ function finishStep(s: FlowState): FlowState {
     }
     case 'smile': {
       const smile = calibrateMax(neutral.blendshapes, s.frames, 'mouthSmile', config);
-      return smile.ok ? go({ ...s, smileMax: smile.max }, 'done') : go(s, 'smile', 'retry');
+      if (!smile.ok) return go(s, 'smile', 'retry');
+      // 가장 크게 웃은 순간에 입이 드리프트 기준만큼 벌어지면, 레이스에서 웃어도 부스트 대신 드리프트가 된다
+      const peak = s.frames.reduce<FaceFrame | null>(
+        (best, f) => (f && (!best || f.blendshapes.mouthSmile > best.blendshapes.mouthSmile) ? f : best),
+        null,
+      );
+      const jaw = peak ? normalize(peak.blendshapes.jawOpen, neutral.blendshapes.jawOpen, s.jawMax ?? 0) : 0;
+      if (jaw >= config.driftOn) return go(s, 'smile', 'smileMouthOpen');
+      return go({ ...s, smileMax: smile.max }, 'done');
     }
     default:
       return s;

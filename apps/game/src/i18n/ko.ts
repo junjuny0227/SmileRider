@@ -44,6 +44,7 @@ export const ko = {
       noFace: '얼굴이 보이지 않아요. 카메라 정면에 앉아 주세요.',
       retry: '잘 인식되지 않았어요. 한 번 더 해 볼게요.',
       tiltTooSmall: '조금 더 크게 기울여 주세요.',
+      smileMouthOpen: '입을 다문 채로 씩 웃어 주세요. 입을 벌리면 드리프트가 돼요.',
     },
     start: '레이스 시작',
     cancel: '처음으로',

@@ -87,6 +87,12 @@ describe('보정 흐름', () => {
     expect(s.notice).toBe('retry');
   });
 
+  it('웃을 때 입이 드리프트 기준만큼 벌어지면 입을 다물고 웃도록 다시 한다 (레이스에서 부스트 대신 드리프트가 되므로)', () => {
+    const s = through([NEUTRAL, TILT_LEFT, JAW, { smile: 0.8, jaw: 0.4 }]);
+    expect(s.step).toBe('smile');
+    expect(s.notice).toBe('smileMouthOpen');
+  });
+
   it('네 단계를 마치면 done이고 보정값이 나온다', () => {
     const s = through([NEUTRAL, TILT_LEFT, JAW, SMILE]);
     expect(s.step).toBe('done');
