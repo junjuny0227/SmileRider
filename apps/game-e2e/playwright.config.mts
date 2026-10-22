@@ -42,21 +42,14 @@ export default defineConfig({
     url: webServerAddress,
     reuseExistingServer: true,
     cwd: workspaceRoot,
+    // 디버그 빌드에서만 ?debug=autopilot, ?laps= 옵션이 동작한다
+    env: { VITE_ENABLE_DEBUG: 'true' },
   },
   projects: [
+    // 1랩을 끝까지 달리는 테스트라 Chromium 하나로만 돌린다
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
     },
 
     // Uncomment for mobile browsers support

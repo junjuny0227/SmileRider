@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { DEFAULT_KART_CONFIG, NO_INPUT, type ControlInput, type TrackSurface } from '@winkrider/kart';
+import { DEFAULT_KART_CONFIG, NO_INPUT, type ControlInput, type KartState, type TrackSurface } from '@winkrider/kart';
 import type { Track } from '@winkrider/track';
 import { useEffect, useRef, type RefObject } from 'react';
 import { Quaternion, Vector3, type Group } from 'three';
@@ -19,8 +19,8 @@ export interface RaceScreenProps {
   mode: InputMode;
   track: Track;
   surface: TrackSurface;
-  /** 주행 로직 한 틱마다 한 번 부른다 */
-  readInput: () => ControlInput;
+  /** 주행 로직 한 틱마다 한 번 부른다. 현재 카트 상태를 넘긴다(디버그 자동 주행용) */
+  readInput: (kart?: KartState) => ControlInput;
   isFaceVisible: () => boolean;
   onFinish: (session: RaceSession) => void;
 }
@@ -62,7 +62,7 @@ function Simulation({ session, input, kart, track, surface, readInput, isFaceVis
     accumulator.current = step.accumulator;
     let s = session.current;
     for (let i = 0; i < step.ticks; i++) {
-      const next = readInput();
+      const next = readInput(s.kart);
       input.current = next;
       const prev = s;
       s = tickRaceSession(s, next, isFaceVisible(), track, surface);

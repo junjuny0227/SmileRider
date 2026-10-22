@@ -1,11 +1,12 @@
 import { createKeyTracker, DEFAULT_CONTROLS_CONFIG, type SteeringMode, type VisionFrame } from '@winkrider/controls';
-import { createRibbonSurface, TICK_RATE } from '@winkrider/kart';
+import { autopilotInput, createRibbonSurface, TICK_RATE, type KartState } from '@winkrider/kart';
 import { buildTrack, skyway } from '@winkrider/track';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { loadAudioSettings, saveAudioSettings, type AudioSettings } from './audio/audio-settings';
 import { applyAudioSettings, initAudio, playSfx } from './audio/sfx';
 import type { FlowResult } from './calibration/flow';
+import { readDebugFlags } from './debug/debug-flags';
 import { isMobileDevice } from './device/is-mobile';
 import { CameraPreview } from './hud/CameraPreview';
 import { createCameraInput, type CameraInput } from './race/camera-input';
@@ -29,7 +30,11 @@ const ticksToMs = (ticks: number) => (ticks * 1000) / TICK_RATE;
 /** 화면 흐름: 시작 → (카메라) 보정 → 레이스 → 결과 (기획 10.2) */
 export function App() {
   const mobile = useMemo(() => isMobileDevice(), []);
-  const track = useMemo(() => buildTrack(skyway), []);
+  const debug = useMemo(
+    () => readDebugFlags(window.location.search, import.meta.env.VITE_ENABLE_DEBUG === 'true'),
+    [],
+  );
+  const track = useMemo(() => buildTrack(debug.laps ? { ...skyway, laps: debug.laps } : skyway), [debug]);
   const surface = useMemo(() => createRibbonSurface(track), [track]);
   const keys = useMemo(() => createKeyTracker(), []);
   const loadBest = useCallback(
@@ -153,8 +158,12 @@ export function App() {
   };
 
   const readInput = useCallback(
-    () => (mode === 'camera' && cameraInput.current ? cameraInput.current.read() : keys.read()),
-    [mode, keys],
+    (kart?: KartState) => {
+      if (mode === 'camera' && cameraInput.current) return cameraInput.current.read();
+      if (debug.autopilot && kart) return autopilotInput(kart, surface);
+      return keys.read();
+    },
+    [mode, keys, debug, surface],
   );
   const isFaceVisible = useCallback(
     () => (mode === 'camera' ? !!cameraInput.current?.isFaceVisible(performance.now()) : true),
