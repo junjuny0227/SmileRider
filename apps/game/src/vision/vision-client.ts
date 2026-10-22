@@ -1,6 +1,8 @@
 import type { VisionFrame } from '@winkrider/controls';
 
 import { classifyCameraError, type CameraErrorKind } from './camera-error';
+import { createFrameGate } from './frame-gate';
+import { mountOffscreen } from './offscreen-video';
 import { MEDIAPIPE_PATHS, type Delegate, type FromWorker, type ToWorker } from './protocol';
 
 export class VisionStartError extends Error {
@@ -11,8 +13,8 @@ export class VisionStartError extends Error {
 }
 
 export interface VisionClient {
-  /** 카메라 미리보기에도 쓴다 */
-  readonly video: HTMLVideoElement;
+  /** 카메라 미리보기는 이 스트림을 자기 video로 따로 재생한다 */
+  readonly stream: MediaStream;
   readonly delegate: Delegate;
   stop(): void;
 }
@@ -57,7 +59,15 @@ export async function startVision(onFrame: (frame: VisionFrame) => void): Promis
   video.muted = true;
   video.playsInline = true;
   video.srcObject = stream;
-  await video.play();
+  // 화면이 바뀌어도 멈추지 않도록 인식용 video는 화면 밖에 계속 붙여 둔다
+  const unmountVideo = mountOffscreen(video);
+  try {
+    await video.play();
+  } catch (error) {
+    unmountVideo();
+    stream.getTracks().forEach((track) => track.stop());
+    throw new VisionStartError(classifyCameraError(error));
+  }
 
   let worker: Worker;
   let delegate: Delegate = 'GPU';
@@ -68,28 +78,28 @@ export async function startVision(onFrame: (frame: VisionFrame) => void): Promis
       delegate = 'CPU';
       worker = await createWorker('CPU');
     } catch {
+      unmountVideo();
       stream.getTracks().forEach((track) => track.stop());
       throw new VisionStartError('model-load-failed');
     }
   }
 
-  let busy = false;
   let frameCount = 0;
   let callbackId = 0;
   let stopped = false;
 
-  worker.onmessage = (event: MessageEvent<FromWorker>) => {
-    if (event.data.type !== 'result') return;
-    busy = false;
-    if (!stopped) onFrame(event.data.frame);
-  };
+  const gate = createFrameGate((frame) => {
+    if (!stopped) onFrame(frame);
+  });
+  worker.onmessage = (event: MessageEvent<FromWorker>) => gate.handle(event.data);
+  // 시작할 때 달아 둔 오류 처리기(init 실패용)를 바꾼다. Worker 오류가 나도 다음 프레임을 보낼 수 있게 한다
+  worker.onerror = () => gate.release();
 
   // 새 카메라 프레임에만 인식하고, Worker가 이전 프레임을 처리 중이면 건너뛴다 (기획 8.1)
   const onVideoFrame = () => {
     if (stopped) return;
     callbackId = video.requestVideoFrameCallback(onVideoFrame);
-    if (busy) return;
-    busy = true;
+    if (!gate.tryStart()) return;
     frameCount++;
     const timestamp = performance.now();
     // CPU에서는 손 인식을 격프레임으로 한다
@@ -103,21 +113,20 @@ export async function startVision(onFrame: (frame: VisionFrame) => void): Promis
         const message: ToWorker = { type: 'frame', bitmap, timestamp, withHand };
         worker.postMessage(message, [bitmap]);
       },
-      () => {
-        busy = false;
-      },
+      () => gate.release(),
     );
   };
   callbackId = video.requestVideoFrameCallback(onVideoFrame);
 
   return {
-    video,
+    stream,
     delegate,
     stop() {
       stopped = true;
       video.cancelVideoFrameCallback(callbackId);
       worker.terminate();
       stream.getTracks().forEach((track) => track.stop());
+      unmountVideo();
     },
   };
 }

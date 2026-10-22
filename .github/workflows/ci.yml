@@ -27,3 +27,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec nx run-many -t lint test typecheck build
+
+      # E2E: 키보드 모드 자동 주행으로 시작부터 결과 화면까지 (기획 10.7)
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec nx e2e @winkrider/game-e2e

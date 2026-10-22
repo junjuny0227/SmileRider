@@ -9,7 +9,8 @@ export type ToWorker =
 export type FromWorker =
   | { type: 'ready'; delegate: Delegate }
   | { type: 'init-error'; delegate: Delegate; message: string }
-  | { type: 'result'; frame: VisionFrame };
+  | { type: 'result'; frame: VisionFrame }
+  | { type: 'frame-error'; message: string };
 
 // 빌드할 때 vite.config.mts가 설치된 @mediapipe/tasks-vision 버전으로 채운다
 declare const __MEDIAPIPE_VERSION__: string;

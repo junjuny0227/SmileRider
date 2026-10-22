@@ -2,11 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
 import { getReadyUrl, workspaceRoot } from '@nx/devkit';
 
-const isCI = !!process.env['CI'];
 // getReadyUrl moves the address to the port the server task reported.
-const webServerAddress = getReadyUrl(
-  isCI ? 'http://localhost:4300' : 'http://localhost:4200',
-);
+// 디버그 옵션(VITE_ENABLE_DEBUG)은 개발 서버에서만 켤 수 있으므로 CI에서도 dev 서버를 쓴다.
+// preview는 배포용 빌드를 그대로 띄워 자동 주행 옵션이 꺼져 있다.
+const webServerAddress = getReadyUrl('http://localhost:4200');
 
 // For CI, you may want to set BASE_URL to the deployed application.
 const baseURL = process.env['BASE_URL'] || webServerAddress;
@@ -36,9 +35,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: isCI
-      ? 'pnpm exec nx run @winkrider/game:preview'
-      : 'pnpm exec nx run @winkrider/game:dev',
+    command: 'pnpm exec nx run @winkrider/game:dev',
     url: webServerAddress,
     reuseExistingServer: true,
     cwd: workspaceRoot,

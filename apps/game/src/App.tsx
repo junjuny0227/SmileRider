@@ -57,6 +57,9 @@ export function App() {
   const vision = useRef<VisionClient | null>(null);
   const listeners = useRef(new Set<(frame: VisionFrame) => void>());
   const cameraInput = useRef<CameraInput | null>(null);
+  // 키 처리기는 한 번만 등록하므로 현재 화면은 ref로 읽는다
+  const racing = useRef(false);
+  racing.current = screen === 'race';
 
   const subscribe = useCallback((listener: (frame: VisionFrame) => void) => {
     listeners.current.add(listener);
@@ -67,7 +70,8 @@ export function App() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (GAME_KEYS.has(e.key)) e.preventDefault();
+      // 레이스 중에만 막는다. 다른 화면에서는 방향키·Space로 버튼과 설정을 조작할 수 있어야 한다
+      if (racing.current && GAME_KEYS.has(e.key)) e.preventDefault();
       keys.down(e.key);
     };
     const up = (e: KeyboardEvent) => keys.up(e.key);
@@ -177,7 +181,7 @@ export function App() {
       return vision.current ? (
         <CalibrationScreen
           steering={steering}
-          video={vision.current.video}
+          stream={vision.current.stream}
           subscribe={subscribe}
           onDone={(cal) => {
             setCalibration(cal);
@@ -198,7 +202,7 @@ export function App() {
             isFaceVisible={isFaceVisible}
             onFinish={finish}
           />
-          {mode === 'camera' && showPreview && vision.current && <CameraPreview video={vision.current.video} />}
+          {mode === 'camera' && showPreview && vision.current && <CameraPreview stream={vision.current.stream} />}
         </>
       );
     case 'result':

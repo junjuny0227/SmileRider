@@ -75,6 +75,9 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
   }
   try {
     detect(msg);
+  } catch (error) {
+    // GPU 컨텍스트 손실 등으로 한 프레임이 실패해도 메인 스레드가 다음 프레임을 보낼 수 있게 알린다
+    post({ type: 'frame-error', message: String(error) });
   } finally {
     msg.bitmap.close();
   }

@@ -17,7 +17,7 @@ import { buttonStyle, screenStyle, secondaryButtonStyle } from './styles';
 
 export interface CalibrationScreenProps {
   steering: SteeringMode;
-  video: HTMLVideoElement;
+  stream: MediaStream;
   /** 인식 결과를 받기 시작하고, 그만 받는 함수를 돌려준다 */
   subscribe: (listener: (frame: VisionFrame) => void) => () => void;
   onDone: (result: FlowResult) => void;
@@ -25,7 +25,7 @@ export interface CalibrationScreenProps {
 }
 
 /** 보정 겸 튜토리얼 (기획 10.2): 평소 표정 → 윙크 또는 고개 기울이기 → 입 → 주먹 → 엄지 척 */
-export function CalibrationScreen({ steering, video, subscribe, onDone, onCancel }: CalibrationScreenProps) {
+export function CalibrationScreen({ steering, stream, subscribe, onDone, onCancel }: CalibrationScreenProps) {
   const [flow, setFlow] = useState(() => createFlow(steering));
   const [last, setLast] = useState<VisionFrame | null>(null);
 
@@ -44,7 +44,7 @@ export function CalibrationScreen({ steering, video, subscribe, onDone, onCancel
 
   return (
     <main style={screenStyle}>
-      <CameraPreview video={video} />
+      <CameraPreview stream={stream} />
       <h1 style={{ margin: 0 }}>{ko.calibration.title}</h1>
       <p style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>{ko.calibration.steps[flow.step]}</p>
       {flow.notice && (

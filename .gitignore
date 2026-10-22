@@ -53,3 +53,6 @@ vitest.config.*.timestamp*
 
 vite.config.*.timestamp*
 test-output
+
+# TypeScript 증분 빌드 정보 (nx typecheck가 생성)
+*.tsbuildinfo

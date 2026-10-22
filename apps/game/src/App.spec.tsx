@@ -64,6 +64,15 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: '카메라로 플레이' })).toBeTruthy();
   });
 
+  it('게임 키의 브라우저 기본 동작은 레이스 중에만 막는다 (시작 화면에서는 방향키·Space로 설정을 조작)', () => {
+    render(<App />);
+    // fireEvent는 preventDefault되면 false를 돌려준다
+    expect(fireEvent.keyDown(window, { key: 'ArrowRight' })).toBe(true);
+    expect(fireEvent.keyDown(window, { key: ' ' })).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: '키보드로 플레이' }));
+    expect(fireEvent.keyDown(window, { key: 'ArrowRight' })).toBe(false);
+  });
+
   it('카메라 권한을 거부하면 안내와 키보드 플레이 버튼을 보여 준다', async () => {
     vi.mocked(startVision).mockRejectedValueOnce(new VisionStartError('permission-denied'));
     render(<App />);
