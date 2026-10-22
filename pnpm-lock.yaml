@@ -315,7 +315,11 @@ importers:
 
   apps/game-e2e: {}
 
-  packages/controls: {}
+  packages/controls:
+    dependencies:
+      '@winkrider/kart':
+        specifier: workspace:*
+        version: link:../kart
 
   packages/kart:
     dependencies:
