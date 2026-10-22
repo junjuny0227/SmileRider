@@ -40,7 +40,6 @@ function createWorker(delegate: Delegate): Promise<Worker> {
       delegate,
       wasmBase: origin + MEDIAPIPE_PATHS.wasmBase,
       faceModel: origin + MEDIAPIPE_PATHS.faceModel,
-      gestureModel: origin + MEDIAPIPE_PATHS.gestureModel,
     };
     worker.postMessage(init);
   });
@@ -84,7 +83,6 @@ export async function startVision(onFrame: (frame: VisionFrame) => void): Promis
     }
   }
 
-  let frameCount = 0;
   let callbackId = 0;
   let stopped = false;
 
@@ -100,17 +98,14 @@ export async function startVision(onFrame: (frame: VisionFrame) => void): Promis
     if (stopped) return;
     callbackId = video.requestVideoFrameCallback(onVideoFrame);
     if (!gate.tryStart()) return;
-    frameCount++;
     const timestamp = performance.now();
-    // CPU에서는 손 인식을 격프레임으로 한다
-    const withHand = delegate === 'GPU' || frameCount % 2 === 0;
     createImageBitmap(video).then(
       (bitmap) => {
         if (stopped) {
           bitmap.close();
           return;
         }
-        const message: ToWorker = { type: 'frame', bitmap, timestamp, withHand };
+        const message: ToWorker = { type: 'frame', bitmap, timestamp };
         worker.postMessage(message, [bitmap]);
       },
       () => gate.release(),

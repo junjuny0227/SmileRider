@@ -3,8 +3,8 @@ import type { VisionFrame } from '@smilerider/controls';
 export type Delegate = 'GPU' | 'CPU';
 
 export type ToWorker =
-  | { type: 'init'; delegate: Delegate; wasmBase: string; faceModel: string; gestureModel: string }
-  | { type: 'frame'; bitmap: ImageBitmap; timestamp: number; withHand: boolean };
+  | { type: 'init'; delegate: Delegate; wasmBase: string; faceModel: string }
+  | { type: 'frame'; bitmap: ImageBitmap; timestamp: number };
 
 export type FromWorker =
   | { type: 'ready'; delegate: Delegate }
@@ -19,5 +19,4 @@ declare const __MEDIAPIPE_VERSION__: string;
 export const MEDIAPIPE_PATHS = {
   wasmBase: `/mediapipe/tasks-vision-${__MEDIAPIPE_VERSION__}`,
   faceModel: '/models/face_landmarker-float16-1.task',
-  gestureModel: '/models/gesture_recognizer-float16-1.task',
 };

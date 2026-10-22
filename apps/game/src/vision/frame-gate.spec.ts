@@ -2,7 +2,7 @@ import type { VisionFrame } from '@smilerider/controls';
 
 import { createFrameGate } from './frame-gate';
 
-const frame: VisionFrame = { timestamp: 1, face: null, hand: null, handEvaluated: true };
+const frame: VisionFrame = { timestamp: 1, face: null };
 
 describe('createFrameGate', () => {
   it('처리 중이면 새 프레임을 보내지 않는다', () => {
