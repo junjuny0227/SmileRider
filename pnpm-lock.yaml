@@ -317,7 +317,11 @@ importers:
 
   packages/controls: {}
 
-  packages/kart: {}
+  packages/kart:
+    dependencies:
+      '@winkrider/track':
+        specifier: workspace:*
+        version: link:../track
 
   packages/track: {}
 
