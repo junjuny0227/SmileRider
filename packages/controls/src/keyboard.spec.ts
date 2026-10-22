@@ -1,14 +1,14 @@
 import { createKeyTracker } from './keyboard.js';
 
 describe('createKeyTracker', () => {
-  it('아무 키도 누르지 않으면 입력 없음', () => {
-    expect(createKeyTracker().read()).toEqual({ steer: 0, throttle: 0, drift: false, boost: false });
+  it('아무 키도 누르지 않으면 엑셀만 자동으로 밟는다', () => {
+    expect(createKeyTracker().read()).toEqual({ steer: 0, throttle: 1, drift: false, boost: false });
   });
 
-  it('↑는 throttle 1, ←는 steer -1, →는 steer 1, 둘 다 누르면 0', () => {
+  it('←는 steer -1, →는 steer 1, 둘 다 누르면 0, ↑는 아무 효과 없음', () => {
     const keys = createKeyTracker();
     keys.down('ArrowUp');
-    expect(keys.read().throttle).toBe(1);
+    expect(keys.read()).toEqual({ steer: 0, throttle: 1, drift: false, boost: false });
     keys.down('ArrowLeft');
     expect(keys.read().steer).toBe(-1);
     keys.down('ArrowRight');
@@ -44,6 +44,6 @@ describe('createKeyTracker', () => {
     keys.down('Shift');
     keys.down('Control');
     keys.blur();
-    expect(keys.read()).toEqual({ steer: 0, throttle: 0, drift: false, boost: false });
+    expect(keys.read()).toEqual({ steer: 0, throttle: 1, drift: false, boost: false });
   });
 });

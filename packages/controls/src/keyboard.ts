@@ -9,7 +9,7 @@ export interface KeyTracker {
   read(): ControlInput;
 }
 
-/** ← → 조향, ↑ 엑셀, Shift 드리프트, Ctrl 부스트 (기획 10.5). 브레이크와 후진은 없다 */
+/** ← → 조향, Shift 드리프트, Ctrl 부스트 (기획 10.5). 엑셀은 자동이고 브레이크와 후진은 없다 */
 export function createKeyTracker(): KeyTracker {
   const pressed = new Set<string>();
   let boostPending = false;
@@ -30,7 +30,7 @@ export function createKeyTracker(): KeyTracker {
       boostPending = false;
       return {
         steer: (pressed.has('ArrowRight') ? 1 : 0) - (pressed.has('ArrowLeft') ? 1 : 0),
-        throttle: pressed.has('ArrowUp') ? 1 : 0,
+        throttle: 1,
         drift: pressed.has('Shift'),
         boost,
       };

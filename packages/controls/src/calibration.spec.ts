@@ -27,10 +27,10 @@ describe('DEFAULT_CONTROLS_CONFIG', () => {
 
 describe('averageNeutral', () => {
   it('얼굴이 없는 프레임을 빼고 표정 수치와 기울기를 평균낸다', () => {
-    const result = averageNeutral([f(0.02, 0, 1), null, f(0.06, 0.1, 3)])!;
-    expect(result.blendshapes.jawOpen).toBeCloseTo(0.04, 6);
-    expect(result.blendshapes.mouthSmile).toBeCloseTo(0.05, 6);
-    expect(result.rollDeg).toBeCloseTo(2, 6);
+    const result = averageNeutral([f(0.02, 0, 1), null, f(0.06, 0.1, 3)]);
+    expect(result?.blendshapes.jawOpen).toBeCloseTo(0.04, 6);
+    expect(result?.blendshapes.mouthSmile).toBeCloseTo(0.05, 6);
+    expect(result?.rollDeg).toBeCloseTo(2, 6);
   });
 
   it('유효 프레임이 없으면 null', () => {
