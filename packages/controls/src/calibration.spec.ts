@@ -1,38 +1,36 @@
-import { averageNeutral, calibrateEyes, calibrateJaw, normalize } from './calibration.js';
+import { averageNeutral, calibrateMax, calibrateTilt, normalize } from './calibration.js';
 import { DEFAULT_CONTROLS_CONFIG } from './config.js';
 import type { Blendshapes, FaceFrame } from './types.js';
 
-const f = (left: number, right = left, jaw = 0): FaceFrame => ({
-  blendshapes: { eyeBlinkLeft: left, eyeBlinkRight: right, jawOpen: jaw },
-  headRollDeg: 0,
+const cfg = DEFAULT_CONTROLS_CONFIG;
+const f = (jaw: number, smile: number, roll = 0): FaceFrame => ({
+  blendshapes: { jawOpen: jaw, mouthSmile: smile },
+  headRollDeg: roll,
 });
-const neutral: Blendshapes = { eyeBlinkLeft: 0.33, eyeBlinkRight: 0.33, jawOpen: 0.05 };
 
 describe('DEFAULT_CONTROLS_CONFIG', () => {
   it('기획 10.9의 초기값', () => {
     expect(DEFAULT_CONTROLS_CONFIG).toEqual({
       neutralSeconds: 3,
       minRange: 0.15,
-      steerDeadzone: 0.15,
-      blinkIgnore: 0.5,
-      throttleLow: 0.1,
-      throttleHigh: 0.8,
       tiltDeadzoneDeg: 5,
       tiltFullDeg: 25,
       smoothing: 0.3,
-      gestureMinScore: 0.6,
-      gestureStreak: 2,
+      driftOn: 0.4,
+      boostOn: 0.6,
+      boostRearm: 0.45,
+      confirmFrames: 2,
       faceLostPauseSeconds: 0.5,
     });
   });
 });
 
 describe('averageNeutral', () => {
-  it('얼굴이 없는 프레임을 빼고 평균낸다', () => {
-    const result = averageNeutral([f(0.3, 0.3, 0.1), null, f(0.4, 0.4, 0.2)]);
-    expect(result!.eyeBlinkLeft).toBeCloseTo(0.35, 6);
-    expect(result!.eyeBlinkRight).toBeCloseTo(0.35, 6);
-    expect(result!.jawOpen).toBeCloseTo(0.15, 6);
+  it('얼굴이 없는 프레임을 빼고 표정 수치와 기울기를 평균낸다', () => {
+    const result = averageNeutral([f(0.02, 0, 1), null, f(0.06, 0.1, 3)])!;
+    expect(result.blendshapes.jawOpen).toBeCloseTo(0.04, 6);
+    expect(result.blendshapes.mouthSmile).toBeCloseTo(0.05, 6);
+    expect(result.rollDeg).toBeCloseTo(2, 6);
   });
 
   it('유효 프레임이 없으면 null', () => {
@@ -41,41 +39,29 @@ describe('averageNeutral', () => {
   });
 });
 
-describe('calibrateEyes', () => {
-  it('왼쪽 윙크에서 eyeBlinkLeft가 오르면 swapEyes false (기획 8.1 실측값)', () => {
-    const result = calibrateEyes(
-      neutral,
-      [f(0.5, 0.4), f(0.66, 0.47), f(0.6, 0.45)],
-      [f(0.4, 0.7)],
-      DEFAULT_CONTROLS_CONFIG,
-    );
-    expect(result).toEqual({ swapEyes: false, maxLeft: 0.66, maxRight: 0.7, leftOk: true, rightOk: true });
+describe('calibrateTilt', () => {
+  it('평소 각도에서 왼쪽 기울기가 +쪽이면 tiltSign -1, -쪽이면 1', () => {
+    expect(calibrateTilt(0, [f(0, 0, 20), f(0, 0, 24)], cfg)).toEqual({ tiltSign: -1, ok: true });
+    expect(calibrateTilt(0, [f(0, 0, -20)], cfg)).toEqual({ tiltSign: 1, ok: true });
   });
 
-  it('왼쪽 윙크에서 eyeBlinkRight가 더 오르면 swapEyes true, 각 값의 최대는 실제로 그 눈을 감은 단계에서 가져온다', () => {
-    const result = calibrateEyes(neutral, [f(0.4, 0.8)], [f(0.75, 0.45)], DEFAULT_CONTROLS_CONFIG);
-    expect(result).toEqual({ swapEyes: true, maxLeft: 0.75, maxRight: 0.8, leftOk: true, rightOk: true });
-  });
-
-  it('범위가 0.15 미만이면 ok false', () => {
-    const result = calibrateEyes(neutral, [f(0.45, 0.35)], [f(0.35, 0.7)], DEFAULT_CONTROLS_CONFIG);
-    expect(result.leftOk).toBe(false);
-    expect(result.rightOk).toBe(true);
-  });
-
-  it('얼굴이 없는 프레임은 무시하고, 전부 없으면 ok false', () => {
-    const result = calibrateEyes(neutral, [null, f(0.7, 0.4), null], [null], DEFAULT_CONTROLS_CONFIG);
-    expect(result.maxLeft).toBe(0.7);
-    expect(result.leftOk).toBe(true);
-    expect(result.rightOk).toBe(false);
+  it('평소 각도 기준 5° 미만이면 ok false (평소 8°, 측정 11°)', () => {
+    expect(calibrateTilt(8, [f(0, 0, 11)], cfg).ok).toBe(false);
+    expect(calibrateTilt(8, [null], cfg).ok).toBe(false);
   });
 });
 
-describe('calibrateJaw', () => {
-  it('입 벌리기 단계의 최댓값과 범위 확인', () => {
-    expect(calibrateJaw(neutral, [f(0, 0, 0.3), null, f(0, 0, 0.6)], DEFAULT_CONTROLS_CONFIG)).toEqual({ max: 0.6, ok: true });
-    expect(calibrateJaw(neutral, [f(0, 0, 0.12)], DEFAULT_CONTROLS_CONFIG).ok).toBe(false);
-    expect(calibrateJaw(neutral, [null], DEFAULT_CONTROLS_CONFIG).ok).toBe(false);
+describe('calibrateMax', () => {
+  const neutral: Blendshapes = { jawOpen: 0.04, mouthSmile: 0 };
+
+  it('그 표정의 최댓값과 범위 확인', () => {
+    expect(calibrateMax(neutral, [f(0.5, 0), null, f(0.79, 0)], 'jawOpen', cfg)).toEqual({ max: 0.79, ok: true });
+    expect(calibrateMax(neutral, [f(0, 0.83)], 'mouthSmile', cfg)).toEqual({ max: 0.83, ok: true });
+    expect(calibrateMax(neutral, [f(0, 0.1)], 'mouthSmile', cfg).ok).toBe(false);
+  });
+
+  it('얼굴이 없으면 최대 값은 평소 값이고 ok false', () => {
+    expect(calibrateMax(neutral, [null], 'jawOpen', cfg)).toEqual({ max: 0.04, ok: false });
   });
 });
 

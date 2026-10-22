@@ -1,66 +1,44 @@
 import type { ControlsConfig } from './config.js';
-import type { BlendshapeName, Blendshapes, FaceFrame } from './types.js';
-
-const NAMES: BlendshapeName[] = ['eyeBlinkLeft', 'eyeBlinkRight', 'jawOpen'];
+import type { BlendshapeName, Blendshapes, FaceFrame, NeutralPose } from './types.js';
 
 const faces = (frames: (FaceFrame | null)[]) => frames.filter((f): f is FaceFrame => f !== null);
 
-const maxOf = (frames: FaceFrame[], name: BlendshapeName, fallback: number) =>
-  frames.reduce((m, f) => Math.max(m, f.blendshapes[name]), fallback);
+const mean = (values: number[]) => values.reduce((sum, v) => sum + v, 0) / values.length;
 
 /** 얼굴이 보인 프레임만 평균낸다. 하나도 없으면 null */
-export function averageNeutral(frames: (FaceFrame | null)[]): Blendshapes | null {
+export function averageNeutral(frames: (FaceFrame | null)[]): NeutralPose | null {
   const valid = faces(frames);
   if (valid.length === 0) return null;
-  const result = { eyeBlinkLeft: 0, eyeBlinkRight: 0, jawOpen: 0 };
-  for (const name of NAMES) {
-    result[name] = valid.reduce((sum, f) => sum + f.blendshapes[name], 0) / valid.length;
-  }
-  return result;
-}
-
-export interface EyeCalibrationResult {
-  swapEyes: boolean;
-  /** eyeBlinkLeft의 최대 값 */
-  maxLeft: number;
-  /** eyeBlinkRight의 최대 값 */
-  maxRight: number;
-  leftOk: boolean;
-  rightOk: boolean;
-}
-
-export function calibrateEyes(
-  neutral: Blendshapes,
-  leftWink: (FaceFrame | null)[],
-  rightWink: (FaceFrame | null)[],
-  config: ControlsConfig,
-): EyeCalibrationResult {
-  const left = faces(leftWink);
-  const right = faces(rightWink);
-  const rise = (frames: FaceFrame[], name: BlendshapeName) => maxOf(frames, name, neutral[name]) - neutral[name];
-
-  // 실제 왼쪽 윙크에서 eyeBlinkRight가 더 오르면, 화면 기준 좌우가 뒤바뀐 것
-  const swapEyes = rise(left, 'eyeBlinkRight') > rise(left, 'eyeBlinkLeft');
-  // 각 값의 최대는 그 값이 가리키는 눈을 실제로 감은 단계에서 가져온다
-  const maxLeft = maxOf(swapEyes ? right : left, 'eyeBlinkLeft', neutral.eyeBlinkLeft);
-  const maxRight = maxOf(swapEyes ? left : right, 'eyeBlinkRight', neutral.eyeBlinkRight);
-
   return {
-    swapEyes,
-    maxLeft,
-    maxRight,
-    leftOk: maxLeft - neutral.eyeBlinkLeft >= config.minRange,
-    rightOk: maxRight - neutral.eyeBlinkRight >= config.minRange,
+    blendshapes: {
+      jawOpen: mean(valid.map((f) => f.blendshapes.jawOpen)),
+      mouthSmile: mean(valid.map((f) => f.blendshapes.mouthSmile)),
+    },
+    rollDeg: mean(valid.map((f) => f.headRollDeg)),
   };
 }
 
-export function calibrateJaw(
+/** 고개를 왼쪽으로 기울인 단계에서 조향 방향을 정한다 */
+export function calibrateTilt(
+  neutralRollDeg: number,
+  frames: (FaceFrame | null)[],
+  config: ControlsConfig,
+): { tiltSign: 1 | -1; ok: boolean } {
+  const valid = faces(frames);
+  const tilt = valid.length ? mean(valid.map((f) => f.headRollDeg)) - neutralRollDeg : 0;
+  // 왼쪽으로 기울였을 때 steer가 음수(왼쪽)가 되도록 부호를 맞춘다
+  return { tiltSign: tilt > 0 ? -1 : 1, ok: Math.abs(tilt) >= config.tiltDeadzoneDeg };
+}
+
+/** 한 표정을 크게 지은 단계의 최댓값과 범위 확인 */
+export function calibrateMax(
   neutral: Blendshapes,
-  open: (FaceFrame | null)[],
+  frames: (FaceFrame | null)[],
+  name: BlendshapeName,
   config: ControlsConfig,
 ): { max: number; ok: boolean } {
-  const max = maxOf(faces(open), 'jawOpen', neutral.jawOpen);
-  return { max, ok: max - neutral.jawOpen >= config.minRange };
+  const max = faces(frames).reduce((m, f) => Math.max(m, f.blendshapes[name]), neutral[name]);
+  return { max, ok: max - neutral[name] >= config.minRange };
 }
 
 /** (raw - neutral) / (max - neutral)을 0~1로 자른다 */

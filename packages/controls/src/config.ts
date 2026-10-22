@@ -4,32 +4,32 @@ export interface ControlsConfig {
   neutralSeconds: number;
   /** 보정 실패 기준: 최대 값 - 평소 값이 이보다 작으면 실패 */
   minRange: number;
-  steerDeadzone: number;
-  /** 두 눈 보정값이 모두 이 이상이면 깜빡임으로 보고 조향 0 */
-  blinkIgnore: number;
-  throttleLow: number;
-  throttleHigh: number;
+  /** 평소 각도에서 이만큼 기울기 전에는 조향 0 (도) */
   tiltDeadzoneDeg: number;
+  /** 평소 각도에서 이만큼 기울이면 최대 조향 (도) */
   tiltFullDeg: number;
   /** 스무딩에서 새 값의 비중 */
   smoothing: number;
-  gestureMinScore: number;
-  /** 손동작을 인정하려면 연속으로 몇 번 인식돼야 하는지 */
-  gestureStreak: number;
+  /** 입 벌림 보정값이 이 이상이면 드리프트 */
+  driftOn: number;
+  /** 웃음 보정값이 이 이상이면 부스트 */
+  boostOn: number;
+  /** 웃음 보정값이 이보다 내려가야 다음 부스트를 낼 수 있다 */
+  boostRearm: number;
+  /** 드리프트와 부스트를 인정하려면 연속으로 몇 프레임 넘어야 하는지 */
+  confirmFrames: number;
   faceLostPauseSeconds: number;
 }
 
 export const DEFAULT_CONTROLS_CONFIG: ControlsConfig = {
   neutralSeconds: 3,
   minRange: 0.15,
-  steerDeadzone: 0.15,
-  blinkIgnore: 0.5,
-  throttleLow: 0.1,
-  throttleHigh: 0.8,
   tiltDeadzoneDeg: 5,
   tiltFullDeg: 25,
   smoothing: 0.3,
-  gestureMinScore: 0.6,
-  gestureStreak: 2,
+  driftOn: 0.4,
+  boostOn: 0.6,
+  boostRearm: 0.45,
+  confirmFrames: 2,
   faceLostPauseSeconds: 0.5,
 };
