@@ -1,4 +1,4 @@
-import { NO_INPUT, TICK_RATE, type ControlInput } from '@winkrider/kart';
+import { NO_INPUT, TICK_RATE, type ControlInput } from '@smilerider/kart';
 import { useEffect, useState, type CSSProperties, type RefObject } from 'react';
 
 import { formatRaceTime, formatSpeed } from '../i18n/format';

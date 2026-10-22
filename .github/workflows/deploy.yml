@@ -33,7 +33,7 @@ jobs:
       - run: pnpm exec nx run-many -t lint test typecheck build
 
       # GitHub Actions에서 빌드하고 결과물만 Cloudflare Pages에 올린다 (기획 7장 배포)
-      - run: pnpm dlx wrangler@4.151.3 pages deploy apps/game/dist --project-name=winkrider --branch=main
+      - run: pnpm dlx wrangler@4.151.3 pages deploy apps/game/dist --project-name=smilerider --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

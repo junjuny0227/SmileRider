@@ -6,7 +6,7 @@ export interface AudioSettings {
 
 export const DEFAULT_AUDIO_SETTINGS: AudioSettings = { muted: false, volume: 0.8 };
 
-const KEY = 'winkrider:audio:v1';
+const KEY = 'smilerider:audio:v1';
 
 function defaultStorage(): Storage | undefined {
   try {

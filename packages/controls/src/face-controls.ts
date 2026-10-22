@@ -1,4 +1,4 @@
-import type { ControlInput } from '@winkrider/kart';
+import type { ControlInput } from '@smilerider/kart';
 
 import { normalize } from './calibration.js';
 import type { ControlsConfig } from './config.js';

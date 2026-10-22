@@ -16,7 +16,7 @@ function mediapipeWasm(): Plugin {
   const files = ['vision_wasm_module_internal.js', 'vision_wasm_module_internal.wasm'];
   const base = `mediapipe/tasks-vision-${mediapipeVersion}/`;
   return {
-    name: 'winkrider-mediapipe-wasm',
+    name: 'smilerider-mediapipe-wasm',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const path = req.url?.split('?')[0] ?? '';
@@ -62,7 +62,7 @@ export default defineConfig(() => ({
     },
   },
   test: {
-    name: '@winkrider/game',
+    name: '@smilerider/game',
     watch: false,
     globals: true,
     environment: 'jsdom',

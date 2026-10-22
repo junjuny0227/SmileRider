@@ -4,7 +4,7 @@ export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/packages/kart',
   test: {
-    name: '@winkrider/kart',
+    name: '@smilerider/kart',
     watch: false,
     passWithNoTests: true,
     globals: true,

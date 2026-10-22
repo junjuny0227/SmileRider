@@ -4,7 +4,7 @@ export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/packages/track',
   test: {
-    name: '@winkrider/track',
+    name: '@smilerider/track',
     watch: false,
     passWithNoTests: true,
     globals: true,

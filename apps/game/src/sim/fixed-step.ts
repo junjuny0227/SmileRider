@@ -1,4 +1,4 @@
-import { TICK_DT } from '@winkrider/kart';
+import { TICK_DT } from '@smilerider/kart';
 
 /** 탭을 오래 비웠다 돌아와도 한 프레임에 몰아서 계산하는 틱 수의 상한 */
 export const MAX_TICKS_PER_FRAME = 5;

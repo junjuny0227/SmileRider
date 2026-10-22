@@ -31,7 +31,7 @@ describe('App', () => {
 
   it('시작 화면에 게임 이름과 플레이 버튼을 보여 준다', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: 'WinkRider' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'SmileRider' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '카메라로 플레이' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '키보드로 플레이' })).toBeTruthy();
   });

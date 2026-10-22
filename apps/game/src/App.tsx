@@ -1,6 +1,6 @@
-import { createKeyTracker, DEFAULT_CONTROLS_CONFIG, type SteeringMode, type VisionFrame } from '@winkrider/controls';
-import { autopilotInput, createRibbonSurface, TICK_RATE, type KartState } from '@winkrider/kart';
-import { buildTrack, skyway } from '@winkrider/track';
+import { createKeyTracker, DEFAULT_CONTROLS_CONFIG, type SteeringMode, type VisionFrame } from '@smilerider/controls';
+import { autopilotInput, createRibbonSurface, TICK_RATE, type KartState } from '@smilerider/kart';
+import { buildTrack, skyway } from '@smilerider/track';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { loadAudioSettings, saveAudioSettings, type AudioSettings } from './audio/audio-settings';

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import { FaceLandmarker, FilesetResolver, GestureRecognizer } from '@mediapipe/tasks-vision';
-import type { FaceFrame, HandFrame } from '@winkrider/controls';
+import type { FaceFrame, HandFrame } from '@smilerider/controls';
 
 import { headRollDegFromMatrix } from './head-roll';
 import type { FromWorker, ToWorker } from './protocol';

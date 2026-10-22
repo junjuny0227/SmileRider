@@ -1,4 +1,4 @@
-import type { VisionFrame } from '@winkrider/controls';
+import type { VisionFrame } from '@smilerider/controls';
 
 import { classifyCameraError, type CameraErrorKind } from './camera-error';
 import { createFrameGate } from './frame-gate';

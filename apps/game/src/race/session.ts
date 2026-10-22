@@ -1,4 +1,4 @@
-import { DEFAULT_CONTROLS_CONFIG } from '@winkrider/controls';
+import { DEFAULT_CONTROLS_CONFIG } from '@smilerider/controls';
 import {
   createKartState,
   DEFAULT_KART_CONFIG,
@@ -7,8 +7,8 @@ import {
   type ControlInput,
   type KartState,
   type TrackSurface,
-} from '@winkrider/kart';
-import { createRaceProgress, updateRaceProgress, type RaceProgress, type Track } from '@winkrider/track';
+} from '@smilerider/kart';
+import { createRaceProgress, updateRaceProgress, type RaceProgress, type Track } from '@smilerider/track';
 
 export type InputMode = 'camera' | 'keyboard';
 export type RacePhase = 'countdown' | 'racing' | 'paused' | 'resuming' | 'finished';

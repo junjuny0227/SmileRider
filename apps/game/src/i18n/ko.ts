@@ -1,6 +1,6 @@
 /** 화면에 보이는 문구는 모두 여기에 둔다. 첫 출시는 한국어만 지원한다 (기획 10.10) */
 export const ko = {
-  appTitle: 'WinkRider',
+  appTitle: 'SmileRider',
   start: {
     tagline: '윙크로 조향하고 입을 벌려 가속하는 3D 카트 레이싱',
     howTo: [
@@ -88,6 +88,6 @@ export const ko = {
   },
   mobile: {
     title: 'PC에서 플레이해 주세요',
-    body: 'WinkRider는 웹캠과 키보드가 있는 PC 브라우저에서 플레이할 수 있어요.',
+    body: 'SmileRider는 웹캠과 키보드가 있는 PC 브라우저에서 플레이할 수 있어요.',
   },
 };

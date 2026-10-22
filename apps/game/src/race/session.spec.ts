@@ -1,5 +1,5 @@
-import { autopilotInput, createRibbonSurface, NO_INPUT, TICK_RATE } from '@winkrider/kart';
-import { buildTrack, skyway } from '@winkrider/track';
+import { autopilotInput, createRibbonSurface, NO_INPUT, TICK_RATE } from '@smilerider/kart';
+import { buildTrack, skyway } from '@smilerider/track';
 
 import { COUNTDOWN_SECONDS, createRaceSession, tickRaceSession, type RaceSession } from './session';
 

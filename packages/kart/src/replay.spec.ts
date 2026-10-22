@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { buildTrack, skyway } from '@winkrider/track';
+import { buildTrack, skyway } from '@smilerider/track';
 
 import { autopilotInput } from './autopilot.js';
 import { DEFAULT_KART_CONFIG, TICK_DT, TICK_RATE } from './config.js';

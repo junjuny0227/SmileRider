@@ -1,4 +1,4 @@
-import { TICK_RATE } from '@winkrider/kart';
+import { TICK_RATE } from '@smilerider/kart';
 
 import { formatRaceTime } from '../i18n/format';
 import { ko } from '../i18n/ko';

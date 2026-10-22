@@ -61,9 +61,9 @@ describe('기록 저장', () => {
 
   it('저장된 JSON이 깨져 있어도 null을 돌려준다', () => {
     const storage = new MemoryStorage();
-    storage.setItem('winkrider:records:v1', '{not json');
+    storage.setItem('smilerider:records:v1', '{not json');
     expect(loadRecord('skyway', 'camera', storage)).toBeNull();
-    storage.setItem('winkrider:records:v1', JSON.stringify({ skyway: { camera: { bestTotalMs: 'fast' } } }));
+    storage.setItem('smilerider:records:v1', JSON.stringify({ skyway: { camera: { bestTotalMs: 'fast' } } }));
     expect(loadRecord('skyway', 'camera', storage)).toBeNull();
   });
 });

@@ -4,7 +4,7 @@ export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/packages/controls',
   test: {
-    name: '@winkrider/controls',
+    name: '@smilerider/controls',
     watch: false,
     passWithNoTests: true,
     globals: true,

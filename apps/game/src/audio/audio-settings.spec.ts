@@ -37,9 +37,9 @@ describe('소리 설정', () => {
 
   it('깨진 값은 기본값으로, 음량은 0~1로 자른다', () => {
     const storage = new MemoryStorage();
-    storage.setItem('winkrider:audio:v1', '{oops');
+    storage.setItem('smilerider:audio:v1', '{oops');
     expect(loadAudioSettings(storage as unknown as Storage)).toEqual({ muted: false, volume: 0.8 });
-    storage.setItem('winkrider:audio:v1', JSON.stringify({ muted: false, volume: 3 }));
+    storage.setItem('smilerider:audio:v1', JSON.stringify({ muted: false, volume: 3 }));
     expect(loadAudioSettings(storage as unknown as Storage).volume).toBe(1);
   });
 });

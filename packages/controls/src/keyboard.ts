@@ -1,4 +1,4 @@
-import type { ControlInput } from '@winkrider/kart';
+import type { ControlInput } from '@smilerider/kart';
 
 export interface KeyTracker {
   /** KeyboardEvent.key 값 */

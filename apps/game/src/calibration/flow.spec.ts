@@ -1,4 +1,4 @@
-import type { HandFrame, VisionFrame } from '@winkrider/controls';
+import type { HandFrame, VisionFrame } from '@smilerider/controls';
 
 import { advanceFlow, createFlow, flowResult, skipStep, switchToHeadTilt, type FlowState } from './flow';
 

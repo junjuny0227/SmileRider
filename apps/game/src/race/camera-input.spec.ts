@@ -1,4 +1,4 @@
-import { DEFAULT_CONTROLS_CONFIG, type Calibration, type HandFrame, type VisionFrame } from '@winkrider/controls';
+import { DEFAULT_CONTROLS_CONFIG, type Calibration, type HandFrame, type VisionFrame } from '@smilerider/controls';
 
 import { createCameraInput } from './camera-input';
 

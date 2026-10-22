@@ -35,7 +35,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'pnpm exec nx run @winkrider/game:dev',
+    command: 'pnpm exec nx run @smilerider/game:dev',
     url: webServerAddress,
     reuseExistingServer: true,
     cwd: workspaceRoot,

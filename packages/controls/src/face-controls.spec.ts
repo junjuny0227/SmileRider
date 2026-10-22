@@ -1,4 +1,4 @@
-import type { ControlInput } from '@winkrider/kart';
+import type { ControlInput } from '@smilerider/kart';
 
 import { DEFAULT_CONTROLS_CONFIG } from './config.js';
 import {

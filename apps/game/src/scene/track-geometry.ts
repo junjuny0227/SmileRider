@@ -1,4 +1,4 @@
-import { sampleAt, type Track, type Vec3 } from '@winkrider/track';
+import { sampleAt, type Track, type Vec3 } from '@smilerider/track';
 
 export interface RibbonGeometry {
   positions: Float32Array;

@@ -1,4 +1,4 @@
-import type { Vec3 } from '@winkrider/track';
+import type { Vec3 } from '@smilerider/track';
 
 export interface ControlInput {
   /** -1 = 왼쪽 최대, 1 = 오른쪽 최대 */

@@ -1,5 +1,5 @@
-import { createRibbonSurface } from '@winkrider/kart';
-import { buildTrack, skyway } from '@winkrider/track';
+import { createRibbonSurface } from '@smilerider/kart';
+import { buildTrack, skyway } from '@smilerider/track';
 
 import { createRaceSession, type RaceSession } from '../race/session';
 import { soundEvents } from './sound-events';

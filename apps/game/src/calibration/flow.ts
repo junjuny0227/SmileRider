@@ -8,7 +8,7 @@ import {
   type FaceFrame,
   type SteeringMode,
   type VisionFrame,
-} from '@winkrider/controls';
+} from '@smilerider/controls';
 
 export type FlowStep = 'neutral' | 'winkLeft' | 'winkRight' | 'tiltLeft' | 'jaw' | 'fist' | 'thumb' | 'done';
 export type FlowNotice = 'noFace' | 'retry' | 'suggestHeadTilt' | 'tiltTooSmall' | 'gestureHelp' | null;

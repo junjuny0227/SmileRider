@@ -1,5 +1,5 @@
 import { Line } from '@react-three/drei';
-import type { Track } from '@winkrider/track';
+import type { Track } from '@smilerider/track';
 import { useEffect, useMemo } from 'react';
 import { BufferAttribute, BufferGeometry } from 'three';
 

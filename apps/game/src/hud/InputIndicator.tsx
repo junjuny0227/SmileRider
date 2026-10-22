@@ -1,4 +1,4 @@
-import type { ControlInput } from '@winkrider/kart';
+import type { ControlInput } from '@smilerider/kart';
 import type { CSSProperties } from 'react';
 
 import { ko } from '../i18n/ko';

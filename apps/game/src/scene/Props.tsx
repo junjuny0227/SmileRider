@@ -1,5 +1,5 @@
 import { useGLTF } from '@react-three/drei';
-import type { Track } from '@winkrider/track';
+import type { Track } from '@smilerider/track';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { Euler, Matrix4, Quaternion, Vector3, type BufferGeometry, type InstancedMesh, type Material, type Mesh } from 'three';
 

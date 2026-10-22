@@ -302,13 +302,13 @@ importers:
       '@react-three/fiber':
         specifier: 9.8.2
         version: 9.8.2(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(three@0.186.1)
-      '@winkrider/controls':
+      '@smilerider/controls':
         specifier: workspace:*
         version: link:../../packages/controls
-      '@winkrider/kart':
+      '@smilerider/kart':
         specifier: workspace:*
         version: link:../../packages/kart
-      '@winkrider/track':
+      '@smilerider/track':
         specifier: workspace:*
         version: link:../../packages/track
       three:
@@ -326,13 +326,13 @@ importers:
 
   packages/controls:
     dependencies:
-      '@winkrider/kart':
+      '@smilerider/kart':
         specifier: workspace:*
         version: link:../kart
 
   packages/kart:
     dependencies:
-      '@winkrider/track':
+      '@smilerider/track':
         specifier: workspace:*
         version: link:../track
 

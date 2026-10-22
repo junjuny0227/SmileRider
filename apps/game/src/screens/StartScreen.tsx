@@ -1,4 +1,4 @@
-import type { SteeringMode } from '@winkrider/controls';
+import type { SteeringMode } from '@smilerider/controls';
 
 import type { AudioSettings } from '../audio/audio-settings';
 import { formatRaceTime } from '../i18n/format';

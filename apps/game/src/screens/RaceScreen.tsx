@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { DEFAULT_KART_CONFIG, NO_INPUT, type ControlInput, type KartState, type TrackSurface } from '@winkrider/kart';
-import type { Track } from '@winkrider/track';
+import { DEFAULT_KART_CONFIG, NO_INPUT, type ControlInput, type KartState, type TrackSurface } from '@smilerider/kart';
+import type { Track } from '@smilerider/track';
 import { useEffect, useRef, type RefObject } from 'react';
 import { Quaternion, Vector3, type Group } from 'three';
 

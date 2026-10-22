@@ -1,4 +1,4 @@
-import type { Track } from '@winkrider/track';
+import type { Track } from '@smilerider/track';
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react';
 import { Object3D, type InstancedMesh } from 'three';
 

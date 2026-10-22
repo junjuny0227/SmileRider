@@ -1,4 +1,4 @@
-import { buildTrack, type TrackControlPoint, type TrackDefinition } from '@winkrider/track';
+import { buildTrack, type TrackControlPoint, type TrackDefinition } from '@smilerider/track';
 
 import { createRibbonSurface } from '../surface.js';
 

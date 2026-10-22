@@ -1,4 +1,4 @@
-import { add, projectToTrack, sampleAt, scale, type Track, type Vec3 } from '@winkrider/track';
+import { add, projectToTrack, sampleAt, scale, type Track, type Vec3 } from '@smilerider/track';
 
 export interface SurfaceQuery {
   s: number;

@@ -5,8 +5,8 @@ import {
   type ControlsConfig,
   type SteeringMode,
   type VisionFrame,
-} from '@winkrider/controls';
-import { NO_INPUT, type ControlInput } from '@winkrider/kart';
+} from '@smilerider/controls';
+import { NO_INPUT, type ControlInput } from '@smilerider/kart';
 
 // 인식 결과가 이 시간 넘게 오지 않으면 얼굴이 안 보이는 것으로 본다(ms)
 const STALE_MS = 300;

@@ -12,7 +12,7 @@ export interface SaveOutcome {
 
 type RecordsData = Record<string, Partial<Record<InputMode, BestRecord>>>;
 
-const KEY = 'winkrider:records:v1';
+const KEY = 'smilerider:records:v1';
 
 // 사생활 보호 모드 등에서는 localStorage에 접근하는 것만으로 예외가 날 수 있다
 function defaultStorage(): Storage | undefined {

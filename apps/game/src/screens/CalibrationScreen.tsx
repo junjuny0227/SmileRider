@@ -1,4 +1,4 @@
-import type { SteeringMode, VisionFrame } from '@winkrider/controls';
+import type { SteeringMode, VisionFrame } from '@smilerider/controls';
 import { useEffect, useState } from 'react';
 
 import {

@@ -1,4 +1,4 @@
-import { createRaceProgress, updateRaceProgress, type Track } from '@winkrider/track';
+import { createRaceProgress, updateRaceProgress, type Track } from '@smilerider/track';
 
 import { DEFAULT_KART_CONFIG, TICK_DT } from './config.js';
 import { createKartState, stepKart } from './step-kart.js';

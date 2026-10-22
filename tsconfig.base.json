@@ -16,7 +16,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@winkrider/source"],
+    "customConditions": ["@smilerider/source"],
     "noUncheckedSideEffectImports": false,
     "types": ["*"]
   }

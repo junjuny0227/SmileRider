@@ -1,4 +1,4 @@
-import { buildTrack, skyway } from '@winkrider/track';
+import { buildTrack, skyway } from '@smilerider/track';
 
 import { buildRailPositions, buildRoadGeometry, pillarPositions } from './track-geometry';
 

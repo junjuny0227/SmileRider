@@ -1,4 +1,4 @@
-import type { Track } from '@winkrider/track';
+import type { Track } from '@smilerider/track';
 import type { ReactNode } from 'react';
 
 import { Roadside } from './Roadside';
