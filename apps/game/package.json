@@ -1,0 +1,15 @@
+{
+  "name": "@winkrider/game",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@mediapipe/tasks-vision": "1.1.1",
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.2",
+    "three": "0.186.1",
+    "zzfx": "1.4.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.186.0"
+  }
+}

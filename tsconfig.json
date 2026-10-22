@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/track"
+    },
+    {
+      "path": "./packages/kart"
+    },
+    {
+      "path": "./packages/controls"
+    },
+    {
+      "path": "./apps/game-e2e"
+    },
+    {
+      "path": "./apps/game"
+    }
+  ],
+  "compilerOptions": {}
+}
