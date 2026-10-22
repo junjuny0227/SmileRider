@@ -20,22 +20,39 @@ const thumb: HandFrame = { gesture: 'Thumb_Up', score: 0.9 };
 
 describe('createCameraInput', () => {
   it('인식 결과가 오기 전에는 입력 없음', () => {
-    expect(make().read()).toEqual({ steer: 0, throttle: 0, drift: false, boost: false });
+    expect(make().read(0)).toEqual({ steer: 0, throttle: 0, drift: false, boost: false });
   });
 
   it('마지막 인식 결과의 조작 입력을 돌려준다', () => {
     const input = make();
     input.push(frame(0));
-    expect(input.read().throttle).toBeGreaterThan(0);
+    expect(input.read(16).throttle).toBeGreaterThan(0);
   });
 
   it('부스트는 인식 결과 하나당 한 번만 전달한다 (주행 틱이 인식보다 잦음)', () => {
     const input = make();
     input.push(frame(0, thumb));
     input.push(frame(33, thumb));
-    expect(input.read().boost).toBe(true);
-    expect(input.read().boost).toBe(false);
-    expect(input.read().boost).toBe(false);
+    expect(input.read(40).boost).toBe(true);
+    expect(input.read(56).boost).toBe(false);
+    expect(input.read(72).boost).toBe(false);
+  });
+
+  it('인식 결과가 300ms 넘게 끊기면 마지막 조작을 유지하지 않고 입력 없음을 돌려준다', () => {
+    const input = make();
+    input.push(frame(1000));
+    expect(input.read(1100).throttle).toBeGreaterThan(0);
+    expect(input.read(1400)).toEqual({ steer: 0, throttle: 0, drift: false, boost: false });
+  });
+
+  it('인식이 끊긴 사이에 대기 중이던 부스트는 버린다', () => {
+    const input = make();
+    input.push(frame(1000, thumb));
+    input.push(frame(1033, thumb));
+    expect(input.read(1500).boost).toBe(false);
+    // 다시 결과가 와도 버린 부스트가 뒤늦게 나가지 않는다
+    input.push(frame(1600, thumb));
+    expect(input.read(1610).boost).toBe(false);
   });
 
   it('얼굴이 보이는지는 마지막 결과와 그 시각으로 판단한다', () => {

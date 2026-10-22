@@ -14,8 +14,8 @@ const STALE_MS = 300;
 export interface CameraInput {
   /** 인식 결과가 올 때마다 부른다 (초당 약 30번) */
   push(frame: VisionFrame): void;
-  /** 주행 틱마다 부른다 (초당 60번) */
-  read(): ControlInput;
+  /** 주행 틱마다 부른다 (초당 60번). 결과가 만료됐으면 마지막 조작을 유지하지 않고 입력 없음을 돌려준다 */
+  read(now: number): ControlInput;
   isFaceVisible(now: number): boolean;
 }
 
@@ -33,6 +33,7 @@ export function createCameraInput(
   let input: ControlInput = NO_INPUT;
   let boostPending = false;
   let last: VisionFrame | null = null;
+  const isFresh = (now: number) => !!last && now - last.timestamp <= STALE_MS;
 
   return {
     push(frame) {
@@ -42,13 +43,15 @@ export function createCameraInput(
       if (result.input.boost) boostPending = true;
       last = frame;
     },
-    read() {
+    read(now) {
       const boost = boostPending;
       boostPending = false;
+      // 카메라나 Worker가 멈춰 결과가 끊기면, 일시정지되기 전 0.5초 동안 마지막 조향·가속으로 달리지 않게 한다
+      if (!isFresh(now)) return NO_INPUT;
       return { ...input, boost };
     },
     isFaceVisible(now) {
-      return !!last?.face && now - last.timestamp <= STALE_MS;
+      return !!last?.face && isFresh(now);
     },
   };
 }

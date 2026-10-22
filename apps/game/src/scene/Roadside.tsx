@@ -2,6 +2,7 @@ import type { Track } from '@winkrider/track';
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react';
 import { Object3D, type InstancedMesh } from 'three';
 
+import { ModelErrorBoundary } from './ModelErrorBoundary';
 import { Props } from './Props';
 import { pillarPositions } from './track-geometry';
 
@@ -45,10 +46,12 @@ export function Roadside({ track }: { track: Track }) {
         <boxGeometry />
         <meshStandardMaterial color="#a3a3a3" />
       </instancedMesh>
-      {/* 소품은 불러오는 대로 나타난다. 그동안에도 게임은 진행된다 */}
-      <Suspense fallback={null}>
-        <Props track={track} />
-      </Suspense>
+      {/* 소품은 불러오는 대로 나타난다. 그동안에도, 불러오지 못해도 게임은 진행된다 */}
+      <ModelErrorBoundary fallback={null}>
+        <Suspense fallback={null}>
+          <Props track={track} />
+        </Suspense>
+      </ModelErrorBoundary>
     </group>
   );
 }

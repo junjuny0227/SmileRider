@@ -163,7 +163,7 @@ export function App() {
 
   const readInput = useCallback(
     (kart?: KartState) => {
-      if (mode === 'camera' && cameraInput.current) return cameraInput.current.read();
+      if (mode === 'camera' && cameraInput.current) return cameraInput.current.read(performance.now());
       if (debug.autopilot && kart) return autopilotInput(kart, surface);
       return keys.read();
     },
