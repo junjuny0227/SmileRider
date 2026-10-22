@@ -1,0 +1,98 @@
+import type { SteeringMode } from '@winkrider/controls';
+
+import { formatRaceTime } from '../i18n/format';
+import { ko } from '../i18n/ko';
+import type { BestRecord } from '../records/records';
+import type { CameraErrorKind } from '../vision/camera-error';
+import { buttonStyle, screenStyle, secondaryButtonStyle } from './styles';
+
+export interface StartScreenProps {
+  steering: SteeringMode;
+  showPreview: boolean;
+  loading: boolean;
+  cameraError: CameraErrorKind | 'model-load-failed' | null;
+  best: { camera: BestRecord | null; keyboard: BestRecord | null };
+  onSteeringChange: (mode: SteeringMode) => void;
+  onPreviewChange: (show: boolean) => void;
+  onPlayCamera: () => void;
+  onPlayKeyboard: () => void;
+}
+
+const bestText = (record: BestRecord | null) => (record ? formatRaceTime(record.bestTotalMs) : ko.start.noRecord);
+
+/** 시작 화면: 소개, 조작 방법, 플레이 버튼, 설정, 최고 기록 (기획 10.2) */
+export function StartScreen(props: StartScreenProps) {
+  const { cameraError } = props;
+  return (
+    <main style={screenStyle}>
+      <h1 style={{ fontSize: 56, margin: 0 }}>{ko.appTitle}</h1>
+      <p style={{ margin: 0 }}>{ko.start.tagline}</p>
+
+      <table style={{ borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            {ko.start.howToHeader.map((h) => (
+              <th key={h} style={{ padding: '4px 12px' }}>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ko.start.howTo.map((row) => (
+            <tr key={row[0]}>
+              {row.map((cell) => (
+                <td key={cell} style={{ padding: '4px 12px' }}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {cameraError && (
+        <p role="alert" style={{ color: '#b42318', fontWeight: 700, margin: 0 }}>
+          {ko.cameraError[cameraError]}
+        </p>
+      )}
+
+      <div style={{ display: 'flex', gap: 12 }}>
+        <button style={buttonStyle} onClick={props.onPlayCamera} disabled={props.loading}>
+          {cameraError === 'model-load-failed' ? ko.cameraError.retry : ko.start.playCamera}
+        </button>
+        <button style={secondaryButtonStyle} onClick={props.onPlayKeyboard} disabled={props.loading}>
+          {ko.start.playKeyboard}
+        </button>
+      </div>
+      {props.loading && <p style={{ margin: 0 }}>{ko.start.loading}</p>}
+
+      <fieldset style={{ border: 'none', display: 'flex', gap: 16, alignItems: 'center' }}>
+        <span>{ko.start.steering}</span>
+        {(['wink', 'headTilt'] as const).map((mode) => (
+          <label key={mode}>
+            <input
+              type="radio"
+              name="steering"
+              checked={props.steering === mode}
+              onChange={() => props.onSteeringChange(mode)}
+            />{' '}
+            {mode === 'wink' ? ko.start.steeringWink : ko.start.steeringTilt}
+          </label>
+        ))}
+        <label>
+          <input type="checkbox" checked={props.showPreview} onChange={(e) => props.onPreviewChange(e.target.checked)} />{' '}
+          {ko.start.preview}
+        </label>
+      </fieldset>
+
+      <p style={{ margin: 0 }}>
+        {ko.start.best} · {ko.start.bestCamera} {bestText(props.best.camera)} · {ko.start.bestKeyboard}{' '}
+        {bestText(props.best.keyboard)}
+      </p>
+      <p style={{ margin: 0, fontSize: 14, opacity: 0.7 }}>
+        {ko.start.privacy} {ko.start.disclaimer}
+      </p>
+    </main>
+  );
+}
