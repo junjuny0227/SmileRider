@@ -40,8 +40,9 @@ export function StartScreen(props: StartScreenProps) {
         <tbody>
           {ko.start.howTo.map((row) => (
             <tr key={row[0]}>
-              {row.map((cell) => (
-                <td key={cell} style={{ padding: '4px 12px' }}>
+              {/* 같은 문구가 두 칸에 올 수 있으므로(엑셀: 자동 / 자동) 칸 위치를 key로 쓴다 */}
+              {row.map((cell, i) => (
+                <td key={ko.start.howToHeader[i]} style={{ padding: '4px 12px' }}>
                   {cell}
                 </td>
               ))}
