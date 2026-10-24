@@ -15,6 +15,8 @@ export interface KartConfig {
   driftDecel: number;
   /** rad */
   maxDriftAngle: number;
+  /** 드리프트 중 진행 방향이 차 앞 방향을 따라오는 비율(1/s). 작을수록 바깥으로 오래 밀린다 */
+  driftGrip: number;
   /** 드리프트 중 초당 게이지 충전량 */
   gaugePerSecond: number;
   maxBoosters: number;
@@ -34,7 +36,8 @@ export const DEFAULT_KART_CONFIG: KartConfig = {
   maxYawRate: 90 * DEG,
   driftYawMultiplier: 1.5,
   driftDecel: 2,
-  maxDriftAngle: 30 * DEG,
+  maxDriftAngle: 40 * DEG,
+  driftGrip: 3.5,
   gaugePerSecond: 0.35,
   maxBoosters: 2,
   boostDuration: 1.5,

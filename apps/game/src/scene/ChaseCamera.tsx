@@ -7,8 +7,11 @@ const ABOVE = 3;
 const LOOK_AHEAD = 4;
 const FOLLOW_RATE = 6;
 
-/** 카트 뒤 8m, 위 3m에서 부드럽게 따라가는 추격 카메라 */
-export function ChaseCamera({ target }: { target: RefObject<Group | null> }) {
+/**
+ * 카트 뒤 8m, 위 3m에서 부드럽게 따라가는 추격 카메라.
+ * 차 앞 방향이 아니라 진행 방향(heading)을 따라가서, 드리프트 중에는 카트가 옆으로 틀어진 모습이 보인다
+ */
+export function ChaseCamera({ target, heading }: { target: RefObject<Group | null>; heading: RefObject<number> }) {
   const forward = useRef(new Vector3());
   const desired = useRef(new Vector3());
   const look = useRef(new Vector3());
@@ -17,9 +20,7 @@ export function ChaseCamera({ target }: { target: RefObject<Group | null> }) {
   useFrame(({ camera }, delta) => {
     const kart = target.current;
     if (!kart) return;
-    kart.getWorldDirection(forward.current);
-    forward.current.y = 0;
-    forward.current.normalize();
+    forward.current.set(Math.sin(heading.current), 0, Math.cos(heading.current));
     desired.current.copy(kart.position).addScaledVector(forward.current, -BEHIND);
     desired.current.y += ABOVE;
     if (placed.current) {

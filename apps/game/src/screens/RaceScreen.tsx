@@ -11,6 +11,7 @@ import { soundEvents } from '../audio/sound-events';
 import { Hud } from '../hud/Hud';
 import { createRaceSession, tickRaceSession, type InputMode, type RaceSession } from '../race/session';
 import { ChaseCamera } from '../scene/ChaseCamera';
+import { DriftSmoke } from '../scene/DriftSmoke';
 import { GameScene } from '../scene/GameScene';
 import { Kart } from '../scene/Kart';
 import { advanceFixedStep } from '../sim/fixed-step';
@@ -31,10 +32,15 @@ interface SimulationProps extends Omit<RaceScreenProps, 'mode'> {
   session: RefObject<RaceSession>;
   input: RefObject<ControlInput>;
   kart: RefObject<Group | null>;
+  /** 카트의 진행 방향(heading + driftAngle). 추격 카메라가 따라간다 */
+  travel: RefObject<number>;
 }
 
+// 두 틱 사이의 각도를 짧은 쪽으로 보간한다
+const lerpAngle = (a: number, b: number, t: number) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * t;
+
 /** Canvas 안에서 프레임마다 고정 간격 틱을 돌리고, 카트 mesh를 ref로 직접 움직인다 (React 상태를 거치지 않음) */
-function Simulation({ session, input, kart, track, surface, readInput, isFaceVisible, onFinish }: SimulationProps) {
+function Simulation({ session, input, kart, travel, track, surface, readInput, isFaceVisible, onFinish }: SimulationProps) {
   const accumulator = useRef(0);
   const reported = useRef(false);
   const tmp = useRef({ up: new Vector3(), tilt: new Quaternion(), yaw: new Quaternion() });
@@ -74,7 +80,8 @@ function Simulation({ session, input, kart, track, surface, readInput, isFaceVis
       input.current.throttle,
       s.kart.boostTimeLeft > 0,
     );
-    sounds.current?.skid.update(s.kart.drifting ? 1 : 0);
+    // 마찰음은 미끄러짐 각도에 비례한다. 드리프트를 풀면 각도가 0으로 돌아오는 동안 함께 줄어든다
+    sounds.current?.skid.update(Math.abs(s.kart.driftAngle) / DEFAULT_KART_CONFIG.maxDriftAngle);
 
     const group = kart.current;
     if (group) {
@@ -85,13 +92,13 @@ function Simulation({ session, input, kart, track, surface, readInput, isFaceVis
         a.position.y + (b.position.y - a.position.y) * t,
         a.position.z + (b.position.z - a.position.z) * t,
       );
-      const turn = Math.atan2(Math.sin(b.heading - a.heading), Math.cos(b.heading - a.heading));
       const { up, tilt, yaw } = tmp.current;
       up.set(b.up.x, b.up.y, b.up.z);
       tilt.setFromUnitVectors(WORLD_UP, up);
-      yaw.setFromAxisAngle(WORLD_UP, a.heading + turn * t);
+      yaw.setFromAxisAngle(WORLD_UP, lerpAngle(a.heading, b.heading, t));
       group.quaternion.copy(tilt).multiply(yaw);
     }
+    travel.current = lerpAngle(s.prevKart.heading + s.prevKart.driftAngle, s.kart.heading + s.kart.driftAngle, step.alpha);
 
     if (s.phase === 'finished' && !reported.current) {
       reported.current = true;
@@ -107,13 +114,15 @@ export function RaceScreen({ track, surface, readInput, isFaceVisible, onFinish 
   const session = useRef<RaceSession>(createRaceSession(track, surface));
   const input = useRef<ControlInput>(NO_INPUT);
   const kart = useRef<Group>(null);
+  const travel = useRef(session.current.kart.heading);
 
   return (
     <div style={{ position: 'fixed', inset: 0 }}>
       <Canvas camera={{ fov: 70, near: 0.1, far: 1500 }}>
         <GameScene track={track}>
           <Kart ref={kart} />
-          <ChaseCamera target={kart} />
+          <DriftSmoke session={session} />
+          <ChaseCamera target={kart} heading={travel} />
           <Simulation
             track={track}
             surface={surface}
@@ -123,6 +132,7 @@ export function RaceScreen({ track, surface, readInput, isFaceVisible, onFinish 
             session={session}
             input={input}
             kart={kart}
+            travel={travel}
           />
         </GameScene>
       </Canvas>

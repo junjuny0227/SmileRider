@@ -36,17 +36,33 @@ describe('드리프트', () => {
     expect(run(surface, state, DRIFT_LEFT, 60).speed).toBeCloseTo(18, 1);
   });
 
-  it('미끄러짐 각도는 30°를 넘지 않고, 드리프트를 풀면 0으로 돌아간다', () => {
+  it('미끄러짐 각도는 40°를 넘지 않고 끝까지 조향하면 약 36°에서 멈추며, 드리프트를 풀면 0으로 돌아간다', () => {
     const { surface, state } = moving(25);
     let s = state;
     for (let i = 0; i < 120; i++) {
       s = step(surface, s, DRIFT_LEFT);
-      expect(Math.abs(s.driftAngle)).toBeLessThanOrEqual(30 * DEG + 1e-9);
+      expect(Math.abs(s.driftAngle)).toBeLessThanOrEqual(40 * DEG + 1e-9);
     }
-    expect(Math.abs(s.driftAngle)).toBeCloseTo(30 * DEG, 5);
+    expect(Math.abs(s.driftAngle) / DEG).toBeGreaterThan(33);
+    expect(Math.abs(s.driftAngle) / DEG).toBeLessThan(39);
     s = run(surface, s, { ...NO_INPUT, throttle: 1 }, 30);
     expect(s.driftAngle).toBe(0);
     expect(s.drifting).toBe(false);
+  });
+
+  it('드리프트를 걸면 처음 0.25초 동안 진행 방향이 일반 주행의 70% 이하만 돌아 바깥으로 밀린다', () => {
+    const { surface, state } = moving(25);
+    const travel = (s: KartState) => s.heading + s.driftAngle - state.heading;
+    const normal = run(surface, state, { ...DRIFT_LEFT, drift: false }, 15);
+    const drift = run(surface, state, DRIFT_LEFT, 15);
+    expect(travel(drift)).toBeLessThan(travel(normal) * 0.7);
+  });
+
+  it('조향을 반만 하면 미끄러짐 각도도 절반쯤이다', () => {
+    const { surface, state } = moving(25);
+    const full = run(surface, state, DRIFT_LEFT, 120);
+    const half = run(surface, state, { ...DRIFT_LEFT, steer: -0.5 }, 120);
+    expect(Math.abs(half.driftAngle)).toBeLessThan(Math.abs(full.driftAngle) * 0.6);
   });
 
   it('약 3초 드리프트하면 부스터 1개를 얻는다', () => {

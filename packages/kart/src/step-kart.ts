@@ -6,8 +6,7 @@ import type { ControlInput, KartState } from './types.js';
 const WALL_EPSILON = 0.01;
 // 부스트 남은 시간의 부동소수점 오차를 0으로 보는 기준(s)
 const TIME_EPSILON = 1e-9;
-// 드리프트 미끄러짐 각도가 커지는 속도와 풀릴 때 돌아오는 속도(rad/s)
-const DRIFT_GROW_RATE = (60 * Math.PI) / 180;
+// 드리프트를 풀었을 때 미끄러짐 각도가 0으로 돌아오는 속도(rad/s)
 const DRIFT_RELEASE_RATE = (90 * Math.PI) / 180;
 
 const headingOf = (v: { x: number; z: number }) => Math.atan2(v.x, v.z);
@@ -61,13 +60,17 @@ export function stepKart(
   const yawRate = config.maxYawRate * (drifting ? config.driftYawMultiplier : 1);
   let heading = state.heading - input.steer * yawRate * Math.min(1, speed / 5) * dt;
 
-  // 드리프트 미끄러짐 각도: 진행 방향이 heading보다 늦게 따라오도록 조향 반대쪽으로 벌어진다
-  const driftTarget = drifting ? Math.sign(input.steer) * config.maxDriftAngle : 0;
-  const driftRate = (drifting ? DRIFT_GROW_RATE : DRIFT_RELEASE_RATE) * dt;
-  const driftAngle =
-    Math.abs(driftTarget - state.driftAngle) <= driftRate
-      ? driftTarget
-      : state.driftAngle + Math.sign(driftTarget - state.driftAngle) * driftRate;
+  // 드리프트 미끄러짐 각도(진행 방향 - heading): 드리프트 중에는 진행 방향이 heading을 접지력만큼 늦게 따라와
+  // 조향 반대쪽(바깥)으로 벌어지고, 많이 꺾을수록 크게 벌어진다. 드리프트를 풀면 일정한 속도로 0으로 돌아온다
+  let driftAngle: number;
+  if (drifting) {
+    const lag = (state.driftAngle - (heading - state.heading)) * (1 - config.driftGrip * dt);
+    driftAngle = Math.max(-config.maxDriftAngle, Math.min(config.maxDriftAngle, lag));
+  } else {
+    const release = DRIFT_RELEASE_RATE * dt;
+    driftAngle =
+      Math.abs(state.driftAngle) <= release ? 0 : state.driftAngle - Math.sign(state.driftAngle) * release;
+  }
 
   // 부스트 게이지
   let boostGauge = state.boostGauge;
